@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - run: pip install -e ".[app,dev]"
+
+      # Unit, mart and dashboard tests. No network: they run against frozen
+      # fixtures, so a change in OpenRouter's API can never turn this red.
+      # That is test_contract.py's job, in its own workflow.
+      - name: Tests
+        run: pytest -q
+
+      - name: Pipeline reproduces from committed raw snapshots
+        run: |
+          python -m orpulse.cli build
+          python -m orpulse.cli report
+          git diff --exit-code docs/FINDINGS.md \
+            || (echo "::error::FINDINGS.md is stale; run 'make report' and commit" && exit 1)

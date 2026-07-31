@@ -1,0 +1,40 @@
+name: API contract
+
+# Deliberately separate from CI.
+#
+# This project reads undocumented `/api/frontend/*` endpoints. They can change
+# without notice. If these assertions lived in the normal test suite, an
+# OpenRouter-side change would turn every pull request red for reasons no
+# contributor could fix -- and the tests would get disabled, losing the alarm.
+#
+# Isolated, a red run here means exactly one thing: the upstream contract moved
+# and the pipeline needs attention.
+on:
+  schedule:
+    - cron: "42 7 * * *"
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "src/orpulse/client.py"
+      - "src/orpulse/transform.py"
+      - "tests/test_contract.py"
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -e ".[dev]"
+
+      - name: Verify the upstream contract
+        env:
+          ORPULSE_USER_AGENT: >-
+            orpulse/0.1 (+https://github.com/${{ github.repository }};
+            contract check; a dozen requests)
+        run: pytest -q -m contract

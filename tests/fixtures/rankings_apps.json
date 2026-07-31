@@ -1,0 +1,157 @@
+{
+ "data": {
+  "day": [
+   {
+    "app": {
+     "categories": [
+      "personal-agent",
+      "cli-agent"
+     ],
+     "created_at": "2026-03-12T23:26:33.624Z",
+     "description": "Hermes Agent is an open-source, self-improving AI agent by Nous Research that runs persistently with memory across sessions, and builds reusable skills from experience. It comes with 40+ built-in tools, including web search, browser automation, and vision, plus scheduled automations and subagents.",
+     "favicon_url": "https://nousresearch.com",
+     "icon_class_name": "",
+     "id": 3067167,
+     "main_url": null,
+     "origin_url": "https://hermes-agent.nousresearch.com/",
+     "related_apps": [
+      2937781,
+      2964811
+     ],
+     "slug": "hermes-agent",
+     "source_code_url": null,
+     "title": "Hermes Agent"
+    },
+    "app_id": 3067167,
+    "rank": 1,
+    "total_requests": 11050156,
+    "total_tokens": "970493416983"
+   },
+   {
+    "app": {
+     "categories": [
+      "cli-agent"
+     ],
+     "created_at": "2025-12-23T22:23:47.378Z",
+     "description": "Claude Code is Anthropic's agentic coding tool that reads your entire codebase, plans and executes changes across files, runs tests, and iterates on failures, all from natural language prompts.",
+     "favicon_url": "https://claude.ai/apple-touch-icon.png",
+     "icon_class_name": "",
+     "id": 2627404,
+     "main_url": null,
+     "origin_url": "https://claude.ai/code",
+     "related_apps": [],
+     "slug": "claude-code",
+     "source_code_url": null,
+     "title": "Claude Code"
+    },
+    "app_id": 2627404,
+    "rank": 2,
+    "total_requests": 5023474,
+    "total_tokens": "422202108769"
+   }
+  ],
+  "month": [
+   {
+    "app": {
+     "categories": [
+      "personal-agent",
+      "cli-agent"
+     ],
+     "created_at": "2026-03-12T23:26:33.624Z",
+     "description": "Hermes Agent is an open-source, self-improving AI agent by Nous Research that runs persistently with memory across sessions, and builds reusable skills from experience. It comes with 40+ built-in tools, including web search, browser automation, and vision, plus scheduled automations and subagents.",
+     "favicon_url": "https://nousresearch.com",
+     "icon_class_name": "",
+     "id": 3067167,
+     "main_url": null,
+     "origin_url": "https://hermes-agent.nousresearch.com/",
+     "related_apps": [
+      2937781,
+      2964811
+     ],
+     "slug": "hermes-agent",
+     "source_code_url": null,
+     "title": "Hermes Agent"
+    },
+    "app_id": 3067167,
+    "rank": 2,
+    "total_requests": 356326906,
+    "total_tokens": "29017594518691"
+   },
+   {
+    "app": {
+     "categories": [
+      "cli-agent",
+      "ide-extension"
+     ],
+     "created_at": "2025-04-09T15:16:20.620Z",
+     "description": "Kilo Code is an open-source AI coding agent that works across VS Code, JetBrains, and CLI to help developers ship code faster with agentic workflows.",
+     "favicon_url": "https://kilocode.ai/",
+     "icon_class_name": "dark:invert invert-0",
+     "id": 2262242,
+     "main_url": "https://github.com/Kilo-Org/kilocode/",
+     "origin_url": "https://kilocode.ai/",
+     "related_apps": [
+      2543560
+     ],
+     "slug": "kilo-code",
+     "source_code_url": null,
+     "title": "Kilo Code"
+    },
+    "app_id": 2262242,
+    "rank": 5,
+    "total_requests": 108449573,
+    "total_tokens": "7294302066812"
+   }
+  ],
+  "week": [
+   {
+    "app": {
+     "categories": [
+      "personal-agent",
+      "cli-agent"
+     ],
+     "created_at": "2026-03-12T23:26:33.624Z",
+     "description": "Hermes Agent is an open-source, self-improving AI agent by Nous Research that runs persistently with memory across sessions, and builds reusable skills from experience. It comes with 40+ built-in tools, including web search, browser automation, and vision, plus scheduled automations and subagents.",
+     "favicon_url": "https://nousresearch.com",
+     "icon_class_name": "",
+     "id": 3067167,
+     "main_url": null,
+     "origin_url": "https://hermes-agent.nousresearch.com/",
+     "related_apps": [
+      2937781,
+      2964811
+     ],
+     "slug": "hermes-agent",
+     "source_code_url": null,
+     "title": "Hermes Agent"
+    },
+    "app_id": 3067167,
+    "rank": 1,
+    "total_requests": 82991294,
+    "total_tokens": "7322804137889"
+   },
+   {
+    "app": {
+     "categories": [
+      "cli-agent"
+     ],
+     "created_at": "2025-12-23T22:23:47.378Z",
+     "description": "Claude Code is Anthropic's agentic coding tool that reads your entire codebase, plans and executes changes across files, runs tests, and iterates on failures, all from natural language prompts.",
+     "favicon_url": "https://claude.ai/apple-touch-icon.png",
+     "icon_class_name": "",
+     "id": 2627404,
+     "main_url": null,
+     "origin_url": "https://claude.ai/code",
+     "related_apps": [],
+     "slug": "claude-code",
+     "source_code_url": null,
+     "title": "Claude Code"
+    },
+    "app_id": 2627404,
+    "rank": 5,
+    "total_requests": 19784115,
+    "total_tokens": "1789132505187"
+   }
+  ]
+ }
+}

@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+.DS_Store
+
+# Raw snapshots are large and regenerable from the API only going forward.
+# They ARE committed by CI (see .github/workflows/daily.yml) because they are
+# the only record of history that exists — but local ad-hoc runs are ignored
+# so a developer experimenting does not pollute the archive.
+data/raw/**/.local
+data/staging/

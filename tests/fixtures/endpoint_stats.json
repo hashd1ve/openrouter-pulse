@@ -1,0 +1,2445 @@
+{
+ "anthropic/claude-opus-5-20260723": {
+  "data": [
+   {
+    "adapter_name": "ClaudeOnAwsAdapter",
+    "allowed_passthrough_parameters": [],
+    "can_abort": false,
+    "capacity_tpm": null,
+    "context_length": 1000000,
+    "created_at": "2026-07-24T17:53:23.652Z",
+    "data_policy": {
+     "canPublish": false,
+     "privacyPolicyURL": "https://aws.amazon.com/privacy",
+     "retainsPrompts": true,
+     "retentionDays": 30,
+     "termsOfServiceURL": "https://aws.amazon.com/service-terms/",
+     "training": false,
+     "trainingOpenRouter": false
+    },
+    "deprecation_date": null,
+    "display_pricing": [
+     {
+      "displayMultiplier": 1000000,
+      "kind": "token",
+      "price": "5e-6",
+      "sku_label": "Input Price",
+      "unitLabel": "/M tokens"
+     },
+     {
+      "displayMultiplier": 1000000,
+      "kind": "token",
+      "price": "25e-6",
+      "sku_label": "Output Price",
+      "unitLabel": "/M tokens"
+     },
+     {
+      "displayMultiplier": 1000000,
+      "kind": "token",
+      "price": ".5e-6",
+      "sku_label": "Cache Read",
+      "unitLabel": "/M tokens"
+     },
+     {
+      "displayMultiplier": 1000000,
+      "kind": "token",
+      "price": "6.25e-6",
+      "sku_label": "Cache Write",
+      "unitLabel": "/M tokens"
+     },
+     {
+      "displayMultiplier": 1000000,
+      "kind": "token",
+      "price": "10e-6",
+      "sku_label": "Cache Write (1h)",
+      "unitLabel": "/M tokens"
+     }
+    ],
+    "excluded_parameters": [
+     "temperature",
+     "top_p",
+     "top_k"
+    ],
+    "features": {
+     "supports_file_urls": true,
+     "supports_native_web_fetch": true,
+     "supports_native_web_search": true,
+     "supports_tool_choice": {
+      "literal_auto": true,
+      "literal_none": true,
+      "literal_required": true,
+      "type_function": true
+     }
+    },
+    "has_chat_completions": true,
+    "has_completions": false,
+    "id": "76cb4608-f48c-483d-8da8-9957fb44244e",
+    "is_byok": false,
+    "is_byok_only": false,
+    "is_deranked": false,
+    "is_disabled": false,
+    "is_free": false,
+    "is_hidden": false,
+    "is_private": false,
+    "limit_rpd": null,
+    "limit_rpm": 250,
+    "limit_rpm_cf": null,
+    "max_completion_tokens": 128000,
+    "max_prompt_tokens": null,
+    "max_tokens_per_image": null,
+    "model": {
+     "author": "anthropic",
+     "author_display_name": "Anthropic",
+     "author_flagship_modalities": [],
+     "context_length": 1000000,
+     "created_at": "2026-07-24T17:02:24.129+00:00",
+     "default_order": [
+      "amazon-bedrock/claude-on-aws",
+      "amazon-bedrock",
+      "google-vertex/global",
+      "anthropic",
+      "google-vertex/europe"
+     ],
+     "default_parameters": {
+      "frequency_penalty": null,
+      "presence_penalty": null,
+      "repetition_penalty": null,
+      "temperature": null,
+      "top_k": null,
+      "top_p": null
+     },
+     "default_stops": [],
+     "default_system": null,
+     "description": "Claude Opus 5 is Anthropic\u2019s flagship model for demanding reasoning, coding, and long-horizon agentic work. It is particularly strong at end-to-end software tasks, code review and bug finding, visual analysis of charts and documents, complex office deliverables, and coordinating parallel subagents.\n\nThe model maintains strong instruction following and tool use across extended tasks, while remaining effective at lower effort settings for workloads that prioritize latency and token efficiency.",
+     "features": {
+      "chat_template_config": {},
+      "reasoning_config": {
+       "default_reasoning_effort": "high",
+       "default_reasoning_enabled": true,
+       "end_token": null,
+       "is_mandatory_reasoning": false,
+       "start_token": null,
+       "supported_reasoning_efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+       ],
+       "supports_reasoning_effort": true,
+       "supports_reasoning_max_tokens": false
+      }
+     },
+     "group": "Claude",
+     "has_text_output": true,
+     "hf_slug": null,
+     "hf_updated_at": null,
+     "hidden": false,
+     "input_modalities": [
+      "text",
+      "image",
+      "file"
+     ],
+     "instruct_type": null,
+     "is_private": false,
+     "is_trainable_image": null,
+     "is_trainable_text": null,
+     "knowledge_cutoff": null,
+     "limit_rpd": 0,
+     "limit_rpm": 0,
+     "model_version_group_id": "b98cca06-1cff-4829-90c2-ef03ddfefb7d",
+     "name": "Claude Opus 5",
+     "output_modalities": [
+      "text"
+     ],
+     "permaslug": "anthropic/claude-opus-5-20260723",
+     "preview_audio": null,
+     "preview_thumbnail_url": null,
+     "previews_by_modality": {},
+     "promotion_message": null,
+     "quick_start_example_type": "reasoning",
+     "reasoning_config": {
+      "default_reasoning_effort": "high",
+      "default_reasoning_enabled": true,
+      "end_token": null,
+      "is_mandatory_reasoning": false,
+      "start_token": null,
+      "supported_reasoning_efforts": [
+       "low",
+       "medium",
+       "high",
+       "xhigh",
+       "max"
+      ],
+      "supports_reasoning_effort": true,
+      "supports_reasoning_max_tokens": false
+     },
+     "required_attestation_types": [],
+     "router": null,
+     "routing_error_message": null,
+     "short_name": "Claude Opus 5",
+     "slug": "anthropic/claude-opus-5",
+     "supported_tts_voices": null,
+     "supports_reasoning": true,
+     "updated_at": "2026-07-24T20:36:14.927545+00:00",
+     "warning_message": null
+    },
+    "model_variant_permaslug": "anthropic/claude-opus-5-20260723",
+    "model_variant_slug": "anthropic/claude-opus-5",
+    "moderation_required": true,
+    "name": "Amazon Bedrock | anthropic/claude-opus-5-20260723",
+    "pricing": {
+     "completion": "0.000025",
+     "discount": 0,
+     "display_pricing": [
+      {
+       "displayMultiplier": 1000000,
+       "kind": "token",
+       "price": "5e-6",
+       "sku_label": "Input Price",
+       "unitLabel": "/M tokens"
+      },
+      {
+       "displayMultiplier": 1000000,
+       "kind": "token",
+       "price": "25e-6",
+       "sku_label": "Output Price",
+       "unitLabel": "/M tokens"
+      },
+      {
+       "displayMultiplier": 1000000,
+       "kind": "token",
+       "price": ".5e-6",
+       "sku_label": "Cache Read",
+       "unitLabel": "/M tokens"
+      },
+      {
+       "displayMultiplier": 1000000,
+       "kind": "token",
+       "price": "6.25e-6",
+       "sku_label": "Cache Write",
+       "unitLabel": "/M tokens"
+      },
+      {
+       "displayMultiplier": 1000000,
+       "kind": "token",
+       "price": "10e-6",
+       "sku_label": "Cache Write (1h)",
+       "unitLabel": "/M tokens"
+      }
+     ],
+     "input_cache_read": "0.0000005",
+     "input_cache_write": "0.00000625",
+     "input_cache_write_1h": "0.00001",
+     "prompt": "0.000005",
+     "web_search": "0.01"
+    },
+    "pricing_json": {
+     "anthropic:cache_read_tokens": ".5e-6",
+     "anthropic:cache_write_1h_tokens": "10e-6",
+     "anthropic:cache_write_5m_tokens": "6.25e-6",
+     "anthropic:completion_tokens": "25e-6",
+     "anthropic:prompt_tokens": "5e-6",
+     "anthropic:web_search_calls": ".01"
+    },
+    "pricing_version_id": "289386ff-182e-4308-bc02-e127d91cbdc6",
+    "provider_display_name": "Claude Platform on AWS",
+    "provider_info": {
+     "adapterName": "ClaudeOnAwsAdapter",
+     "baseUrl": "https://aws-external-anthropic.us-east-1.api.aws/v1",
+     "byokEnabled": true,
+     "dataPolicy": {
+      "canPublish": false,
+      "privacyPolicyURL": "https://aws.amazon.com/privacy",
+      "requiresUserIDs": false,
+      "retainsPrompts": false,
+      "termsOfServiceURL": "https://aws.amazon.com/service-terms/",
+      "training": false,
+      "trainingOpenRouter": false
+     },
+     "displayName": "Claude Platform on AWS",
+     "editors": [
+      "{}"
+     ],
+     "hasChatCompletions": true,
+     "hasCompletions": false,
+     "headquarters": "US",
+     "icon": {
+      "url": "/images/icons/Bedrock.svg"
+     },
+     "isAbortable": false,
+     "moderationRequired": true,
+     "name": "Amazon Bedrock",
+     "owners": [
+      "org_39b6V1QWwN007RTEQkmKy4KCs4k"
+     ],
+     "pricingStrategy": "anthropic",
+     "sendClientIp": false,
+     "slug": "amazon-bedrock/claude-on-aws",
+     "statusPageUrl": "https://health.aws.amazon.com/health/status"
+    },
+    "provider_model_id": "claude-opus-5",
+    "provider_name": "Amazon Bedrock",
+    "provider_region": null,
+    "provider_slug": "amazon-bedrock/claude-on-aws",
+    "quantization": "unknown",
+    "stats": {
+     "endpoint_id": "76cb4608-f48c-483d-8da8-9957fb44244e",
+     "p50_latency": 4429.5,
+     "p50_throughput": 55,
+     "p75_latency": 5500.5,
+     "p75_throughput": 69,
+     "p90_latency": 6874.200000000004,
+     "p90_throughput": 78,
+     "p95_latency": 8294.399999999998,
+     "p95_throughput": 86,
+     "p99_latency": 12759.630000000001,
+     "p99_throughput": 101.09000000000015,
+     "request_count": 18449,
+     "window_minutes": 30
+    },
+    "statsByTier": {
+     "default": {
+      "endpoint_id": "76cb4608-f48c-483d-8da8-9957fb44244e",
+      "p50_latency": 4446,
+      "p50_throughput": 54,
+      "p75_latency": 5490,
+      "p75_throughput": 68,
+      "p90_latency": 6880.200000000004,
+      "p90_throughput": 78,
+      "p95_latency": 8264.25,
+      "p95_throughput": 85,
+      "p99_latency": 12643.94000000001,
+      "p99_throughput": 101,
+      "request_count": 18405,
+      "window_minutes": 30
+     }
+    },
+    "status": 0,
+    "status_heuristics": {
+     "derankableError": 9,
+     "rateLimited": 0,
+     "success": 18954
+    },
+    "status_heuristics_1d": {
+     "derankableError": 877,
+     "rateLimited": 0,
+     "success": 868196
+    },
+    "status_heuristics_5m": {
+     "derankableError": 0,
+     "rateLimited": 0,
+     "success": 2158
+    },
+    "supported_image_parameters": null,
+    "supported_parameters": [
+     "reasoning",
+     "include_reasoning",
+     "max_tokens",
+     "stop",
+     "tool_choice",
+     "tools",
+     "structured_outputs",
+     "response_format",
+     "verbosity"
+    ],
+    "supported_video_parameters": null,
+    "supports_multipart": true,
+    "supports_reasoning": true,
+    "supports_tool_parameters": true,
+    "variant": "standard"
+   },
+   {
+    "adapter_name": "ClaudeOnAwsAdapter",
+    "allowed_passthrough_parameters": [],
+    "can_abort": true,
+    "capacity_tpm": null,
+    "context_length": 1000000,
+    "created_at": "2026-07-25T19:49:17.571Z",
+    "data_policy": {
+     "canPublish": false,
+     "privacyPolicyURL": "https://www.anthropic.com/legal/privacy",
+     "requiresUserIDs": true,
+     "retainsPrompts": true,
+     "retentionDays": 30,
+     "termsOfServiceURL": "https://www.anthropic.com/legal/commercial-terms",
+     "training": false,
+     "trainingOpenRouter": false
+    },
+    "deprecation_date": null,
+    "display_pricing": [
+     {
+      "displayMultiplier": 1000000,
+      "kind": "token",
+      "price": "5e-6",
+      "sku_label": "Input Price",
+      "unitLabel": "/M tokens"
+     },
+     {
+      "displayMultiplier": 1000000,
+      "kind": "token",
+      "price": "25e-6",
+      "sku_label": "Output Price",
+      "unitLabel": "/M tokens"
+     },
+     {
+      "displayMultiplier": 1000000,
+      "kind": "token",
+      "price": ".5e-6",
+      "sku_label": "Cache Read",
+      "unitLabel": "/M tokens"
+     },
+     {
+      "displayMultiplier": 1000000,
+      "kind": "token",
+      "price": "6.25e-6",
+      "sku_label": "Cache Write",
+      "unitLabel": "/M tokens"
+     },
+     {
+      "displayMultiplier": 1000000,
+      "kind": "token",
+      "price": "10e-6",
+      "sku_label": "Cache Write (1h)",
+      "unitLabel": "/M tokens"
+     }
+    ],
+    "excluded_parameters": [
+     "temperature",
+     "top_p",
+     "top_k"
+    ],
+    "features": {
+     "supports_file_urls": true,
+     "supports_native_web_fetch": true,
+     "supports_native_web_search": true,
+     "supports_tool_choice": {
+      "literal_auto": true,
+      "literal_none": true,
+      "literal_required": true,
+      "type_function": true
+     }
+    },
+    "has_chat_completions": true,
+    "has_completions": false,
+    "id": "2edf66f3-04ad-4c38-b05a-bc69cf1a29ef",
+    "is_byok": false,
+    "is_byok_only": false,
+    "is_deranked": false,
+    "is_disabled": false,
+    "is_free": false,
+    "is_hidden": false,
+    "is_private": false,
+    "limit_rpd": null,
+    "limit_rpm": 250,
+    "limit_rpm_cf": null,
+    "max_completion_tokens": 128000,
+    "max_prompt_tokens": null,
+    "max_tokens_per_image": null,
+    "model": {
+     "author": "anthropic",
+     "author_display_name": "Anthropic",
+     "author_flagship_modalities": [],
+     "context_length": 1000000,
+     "created_at": "2026-07-24T17:02:24.129+00:00",
+     "default_order": [
+      "amazon-bedrock/claude-on-aws",
+      "amazon-bedrock",
+      "google-vertex/global",
+      "anthropic",
+      "google-vertex/europe"
+     ],
+     "default_parameters": {
+      "frequency_penalty": null,
+      "presence_penalty": null,
+      "repetition_penalty": null,
+      "temperature": null,
+      "top_k": null,
+      "top_p": null
+     },
+     "default_stops": [],
+     "default_system": null,
+     "description": "Claude Opus 5 is Anthropic\u2019s flagship model for demanding reasoning, coding, and long-horizon agentic work. It is particularly strong at end-to-end software tasks, code review and bug finding, visual analysis of charts and documents, complex office deliverables, and coordinating parallel subagents.\n\nThe model maintains strong instruction following and tool use across extended tasks, while remaining effective at lower effort settings for workloads that prioritize latency and token efficiency.",
+     "features": {
+      "chat_template_config": {},
+      "reasoning_config": {
+       "default_reasoning_effort": "high",
+       "default_reasoning_enabled": true,
+       "end_token": null,
+       "is_mandatory_reasoning": false,
+       "start_token": null,
+       "supported_reasoning_efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+       ],
+       "supports_reasoning_effort": true,
+       "supports_reasoning_max_tokens": false
+      }
+     },
+     "group": "Claude",
+     "has_text_output": true,
+     "hf_slug": null,
+     "hf_updated_at": null,
+     "hidden": false,
+     "input_modalities": [
+      "text",
+      "image",
+      "file"
+     ],
+     "instruct_type": null,
+     "is_private": false,
+     "is_trainable_image": null,
+     "is_trainable_text": null,
+     "knowledge_cutoff": null,
+     "limit_rpd": 0,
+     "limit_rpm": 0,
+     "model_version_group_id": "b98cca06-1cff-4829-90c2-ef03ddfefb7d",
+     "name": "Claude Opus 5",
+     "output_modalities": [
+      "text"
+     ],
+     "permaslug": "anthropic/claude-opus-5-20260723",
+     "preview_audio": null,
+     "preview_thumbnail_url": null,
+     "previews_by_modality": {},
+     "promotion_message": null,
+     "quick_start_example_type": "reasoning",
+     "reasoning_config": {
+      "default_reasoning_effort": "high",
+      "default_reasoning_enabled": true,
+      "end_token": null,
+      "is_mandatory_reasoning": false,
+      "start_token": null,
+      "supported_reasoning_efforts": [
+       "low",
+       "medium",
+       "high",
+       "xhigh",
+       "max"
+      ],
+      "supports_reasoning_effort": true,
+      "supports_reasoning_max_tokens": false
+     },
+     "required_attestation_types": [],
+     "router": null,
+     "routing_error_message": null,
+     "short_name": "Claude Opus 5",
+     "slug": "anthropic/claude-opus-5",
+     "supported_tts_voices": null,
+     "supports_reasoning": true,
+     "updated_at": "2026-07-24T20:36:14.927545+00:00",
+     "warning_message": null
+    },
+    "model_variant_permaslug": "anthropic/claude-opus-5-20260723",
+    "model_variant_slug": "anthropic/claude-opus-5",
+    "moderation_required": true,
+    "name": "Claude Platform on AWS | anthropic/claude-opus-5-20260723",
+    "pricing": {
+     "completion": "0.000025",
+     "discount": 0,
+     "display_pricing": [
+      {
+       "displayMultiplier": 1000000,
+       "kind": "token",
+       "price": "5e-6",
+       "sku_label": "Input Price",
+       "unitLabel": "/M tokens"
+      },
+      {
+       "displayMultiplier": 1000000,
+       "kind": "token",
+       "price": "25e-6",
+       "sku_label": "Output Price",
+       "unitLabel": "/M tokens"
+      },
+      {
+       "displayMultiplier": 1000000,
+       "kind": "token",
+       "price": ".5e-6",
+       "sku_label": "Cache Read",
+       "unitLabel": "/M tokens"
+      },
+      {
+       "displayMultiplier": 1000000,
+       "kind": "token",
+       "price": "6.25e-6",
+       "sku_label": "Cache Write",
+       "unitLabel": "/M tokens"
+      },
+      {
+       "displayMultiplier": 1000000,
+       "kind": "token",
+       "price": "10e-6",
+       "sku_label": "Cache Write (1h)",
+       "unitLabel": "/M tokens"
+      }
+     ],
+     "input_cache_read": "0.0000005",
+     "input_cache_write": "0.00000625",
+     "input_cache_write_1h": "0.00001",
+     "prompt": "0.000005",
+     "web_search": "0.01"
+    },
+    "pricing_json": {
+     "anthropic:cache_read_tokens": ".5e-6",
+     "anthropic:cache_write_1h_tokens": "10e-6",
+     "anthropic:cache_write_5m_tokens": "6.25e-6",
+     "anthropic:completion_tokens": "25e-6",
+     "anthropic:prompt_tokens": "5e-6",
+     "anthropic:web_search_calls": ".01"
+    },
+    "pricing_version_id": "e9e376f5-5c81-4454-88b8-1063473daef1",
+    "provider_display_name": "Claude Platform on AWS",
+    "provider_info": {
+     "adapterName": "ClaudeOnAwsAdapter",
+     "baseUrl": "https://aws-external-anthropic.us-east-1.api.aws/v1",
+     "byokEnabled": false,
+     "dataPolicy": {
+      "canPublish": false,
+      "privacyPolicyURL": "https://www.anthropic.com/legal/privacy",
+      "requiresUserIDs": true,
+      "retainsPrompts": true,
+      "retentionDays": 30,
+      "termsOfServiceURL": "https://www.anthropic.com/legal/commercial-terms",
+      "training": false,
+      "trainingOpenRouter": false
+     },
+     "displayName": "Claude Platform on AWS",
+     "editors": [],
+     "hasChatCompletions": true,
+     "hasCompletions": false,
+     "headquarters": "US",
+     "icon": {
+      "url": "/images/icons/Anthropic.svg"
+     },
+     "isAbortable": true,
+     "moderationRequired": true,
+     "name": "Claude Platform on AWS",
+     "owners": [],
+     "pricingStrategy": "anthropic",
+     "sendClientIp": false,
+     "slug": "claude-on-aws",
+     "statusPageUrl": "https://status.anthropic.com/"
+    },
+    "provider_model_id": "claude-opus-5",
+    "provider_name": "Claude Platform on AWS",
+    "provider_region": null,
+    "provider_slug": "claude-on-aws",
+    "quantization": "unknown",
+    "stats": {
+     "endpoint_id": "2edf66f3-04ad-4c38-b05a-bc69cf1a29ef",
+     "p50_latency": 10446,
+     "p50_throughput": 68.5,
+     "p75_latency": 10864,
+     "p75_throughput": 71.25,
+     "p90_latency": 11114.800000000001,
+     "p90_throughput": 72.9,
+     "p95_latency": 11198.4,
+     "p95_throughput": 73.45,
+     "p99_latency": 11265.28,
+     "p99_throughput": 73.89,
+     "request_count": 2,
+     "window_minutes": 30
+    },
+    "statsByTier": {
+     "default": {
+      "endpoint_id": "2edf66f3-04ad-4c38-b05a-bc69cf1a29ef",
+      "p50_latency": 10446,
+      "p50_throughput": 68.5,
+      "p75_latency": 10864,
+      "p75_throughput": 71.25,
+      "p90_latency": 11114.800000000001,
+      "p90_throughput": 72.9,
+      "p95_latency": 11198.4,
+      "p95_throughput": 73.45,
+      "p99_latency": 11265.28,
+      "p99_throughput": 73.89,
+      "request_count": 2,
+      "window_minutes": 30
+     }
+    },
+    "status": 0,
+    "status_heuristics": {
+     "derankableError": 0,
+     "rateLimited": 0,
+     "success": 0
+    },
+    "status_heuristics_1d": {
+     "derankableError": 20,
+     "rateLimited": 0,
+     "success": 4017
+    },
+    "status_heuristics_5m": {
+     "derankableError": 0,
+     "rateLimited": 0,
+     "success": 0
+    },
+    "supported_image_parameters": null,
+    "supported_parameters": [
+     "max_tokens",
+     "stop",
+     "reasoning",
+     "include_reasoning",
+     "tool_choice",
+     "tools",
+     "structured_outputs",
+     "response_format",
+     "verbosity"
+    ],
+    "supported_video_parameters": null,
+    "supports_multipart": true,
+    "supports_reasoning": true,
+    "supports_tool_parameters": true,
+    "variant": "standard"
+   },
+   {
+    "adapter_name": "AnthropicMessageAdapter",
+    "allowed_passthrough_parameters": [],
+    "can_abort": true,
+    "capacity_tpm": null,
+    "context_length": 1000000,
+    "created_at": "2026-07-22T17:23:17.489Z",
+    "data_policy": {
+     "canPublish": false,
+     "privacyPolicyURL": "https://www.anthropic.com/legal/privacy",
+     "requiresUserIDs": true,
+     "retainsPrompts": true,
+     "retentionDays": 30,
+     "termsOfServiceURL": "https://www.anthropic.com/legal/commercial-terms",
+     "training": false,
+     "trainingOpenRouter": false
+    },
+    "deprecation_date": null,
+    "display_pricing": [
+     {
+      "displayMultiplier": 1000000,
+      "kind": "token",
+      "price": "5e-6",
+      "sku_label": "Input Price",
+      "unitLabel": "/M tokens"
+     },
+     {
+      "displayMultiplier": 1000000,
+      "kind": "token",
+      "price": "25e-6",
+      "sku_label": "Output Price",
+      "unitLabel": "/M tokens"
+     },
+     {
+      "displayMultiplier": 1000000,
+      "kind": "token",
+      "price": ".5e-6",
+      "sku_label": "Cache Read",
+      "unitLabel": "/M tokens"
+     },
+     {
+      "displayMultiplier": 1000000,
+      "kind": "token",
+      "price": "6.25e-6",
+      "sku_label": "Cache Write",
+      "unitLabel": "/M tokens"
+     },
+     {
+      "displayMultiplier": 1000000,
+      "kind": "token",
+      "price": "10e-6",
+      "sku_label": "Cache Write (1h)",
+      "unitLabel": "/M tokens"
+     }
+    ],
+    "excluded_parameters": [
+     "temperature",
+     "top_p",
+     "top_k"
+    ],
+    "features": {
+     "supports_file_urls": true,
+     "supports_native_web_fetch": true,
+     "supports_native_web_search": true,
+     "supports_tool_choice": {
+      "literal_auto": true,
+      "literal_none": true,
+      "literal_required": true,
+      "type_function": true
+     }
+    },
+    "has_chat_completions": true,
+    "has_completions": false,
+    "id": "a6a218f6-0bca-440c-98b5-66bccd2f9480",
+    "is_byok": false,
+    "is_byok_only": false,
+    "is_deranked": false,
+    "is_disabled": false,
+    "is_free": false,
+    "is_hidden": false,
+    "is_private": false,
+    "limit_rpd": null,
+    "limit_rpm": 250,
+    "limit_rpm_cf": null,
+    "max_completion_tokens": 128000,
+    "max_prompt_tokens": null,
+    "max_tokens_per_image": null,
+    "model": {
+     "author": "anthropic",
+     "author_display_name": "Anthropic",
+     "author_flagship_modalities": [],
+     "context_length": 1000000,
+     "created_at": "2026-07-24T17:02:24.129+00:00",
+     "default_order": [
+      "amazon-bedrock/claude-on-aws",
+      "amazon-bedrock",
+      "google-vertex/global",
+      "anthropic",
+      "google-vertex/europe"
+     ],
+     "default_parameters": {
+      "frequency_penalty": null,
+      "presence_penalty": null,
+      "repetition_penalty": null,
+      "temperature": null,
+      "top_k": null,
+      "top_p": null
+     },
+     "default_stops": [],
+     "default_system": null,
+     "description": "Claude Opus 5 is Anthropic\u2019s flagship model for demanding reasoning, coding, and long-horizon agentic work. It is particularly strong at end-to-end software tasks, code review and bug finding, visual analysis of charts and documents, complex office deliverables, and coordinating parallel subagents.\n\nThe model maintains strong instruction following and tool use across extended tasks, while remaining effective at lower effort settings for workloads that prioritize latency and token efficiency.",
+     "features": {
+      "chat_template_config": {},
+      "reasoning_config": {
+       "default_reasoning_effort": "high",
+       "default_reasoning_enabled": true,
+       "end_token": null,
+       "is_mandatory_reasoning": false,
+       "start_token": null,
+       "supported_reasoning_efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+       ],
+       "supports_reasoning_effort": true,
+       "supports_reasoning_max_tokens": false
+      }
+     },
+     "group": "Claude",
+     "has_text_output": true,
+     "hf_slug": null,
+     "hf_updated_at": null,
+     "hidden": false,
+     "input_modalities": [
+      "text",
+      "image",
+      "file"
+     ],
+     "instruct_type": null,
+     "is_private": false,
+     "is_trainable_image": null,
+     "is_trainable_text": null,
+     "knowledge_cutoff": null,
+     "limit_rpd": 0,
+     "limit_rpm": 0,
+     "model_version_group_id": "b98cca06-1cff-4829-90c2-ef03ddfefb7d",
+     "name": "Claude Opus 5",
+     "output_modalities": [
+      "text"
+     ],
+     "permaslug": "anthropic/claude-opus-5-20260723",
+     "preview_audio": null,
+     "preview_thumbnail_url": null,
+     "previews_by_modality": {},
+     "promotion_message": null,
+     "quick_start_example_type": "reasoning",
+     "reasoning_config": {
+      "default_reasoning_effort": "high",
+      "default_reasoning_enabled": true,
+      "end_token": null,
+      "is_mandatory_reasoning": false,
+      "start_token": null,
+      "supported_reasoning_efforts": [
+       "low",
+       "medium",
+       "high",
+       "xhigh",
+       "max"
+      ],
+      "supports_reasoning_effort": true,
+      "supports_reasoning_max_tokens": false
+     },
+     "required_attestation_types": [],
+     "router": null,
+     "routing_error_message": null,
+     "short_name": "Claude Opus 5",
+     "slug": "anthropic/claude-opus-5",
+     "supported_tts_voices": null,
+     "supports_reasoning": true,
+     "updated_at": "2026-07-24T20:36:14.927545+00:00",
+     "warning_message": null
+    },
+    "model_variant_permaslug": "anthropic/claude-opus-5-20260723",
+    "model_variant_slug": "anthropic/claude-opus-5",
+    "moderation_required": true,
+    "name": "Anthropic | anthropic/claude-opus-5-20260723",
+    "pricing": {
+     "completion": "0.000025",
+     "discount": 0,
+     "display_pricing": [
+      {
+       "displayMultiplier": 1000000,
+       "kind": "token",
+       "price": "5e-6",
+       "sku_label": "Input Price",
+       "unitLabel": "/M tokens"
+      },
+      {
+       "displayMultiplier": 1000000,
+       "kind": "token",
+       "price": "25e-6",
+       "sku_label": "Output Price",
+       "unitLabel": "/M tokens"
+      },
+      {
+       "displayMultiplier": 1000000,
+       "kind": "token",
+       "price": ".5e-6",
+       "sku_label": "Cache Read",
+       "unitLabel": "/M tokens"
+      },
+      {
+       "displayMultiplier": 1000000,
+       "kind": "token",
+       "price": "6.25e-6",
+       "sku_label": "Cache Write",
+       "unitLabel": "/M tokens"
+      },
+      {
+       "displayMultiplier": 1000000,
+       "kind": "token",
+       "price": "10e-6",
+       "sku_label": "Cache Write (1h)",
+       "unitLabel": "/M tokens"
+      }
+     ],
+     "input_cache_read": "0.0000005",
+     "input_cache_write": "0.00000625",
+     "input_cache_write_1h": "0.00001",
+     "prompt": "0.000005",
+     "web_search": "0.01"
+    },
+    "pricing_json": {
+     "anthropic:cache_read_tokens": ".5e-6",
+     "anthropic:cache_write_1h_tokens": "10e-6",
+     "anthropic:cache_write_5m_tokens": "6.25e-6",
+     "anthropic:completion_tokens": "25e-6",
+     "anthropic:prompt_tokens": "5e-6",
+     "anthropic:web_search_calls": ".01"
+    },
+    "pricing_version_id": "a5451a34-7327-42d8-b2d4-dc4b75b7e174",
+    "provider_display_name": "Anthropic",
+    "provider_info": {
+     "adapterName": "AnthropicMessageAdapter",
+     "baseUrl": "https://api.anthropic.com/v1",
+     "byokEnabled": true,
+     "dataPolicy": {
+      "canPublish": false,
+      "privacyPolicyURL": "https://www.anthropic.com/legal/privacy",
+      "requiresUserIDs": true,
+      "retainsPrompts": true,
+      "retentionDays": 30,
+      "termsOfServiceURL": "https://www.anthropic.com/legal/commercial-terms",
+      "training": false,
+      "trainingOpenRouter": false
+     },
+     "displayName": "Anthropic",
+     "editors": [
+      "{}"
+     ],
+     "hasChatCompletions": true,
+     "hasCompletions": true,
+     "headquarters": "US",
+     "icon": {
+      "url": "/images/icons/Anthropic.svg"
+     },
+     "isAbortable": true,
+     "moderationRequired": true,
+     "name": "Anthropic",
+     "owners": [
+      "{}"
+     ],
+     "pricingStrategy": "anthropic",
+     "sendClientIp": false,
+     "slug": "anthropic",
+     "statusPageUrl": "https://status.anthropic.com/"
+    },
+    "provider_model_id": "claude-opus-5",
+    "provider_name": "Anthropic",
+    "provider_region": null,
+    "provider_slug": "anthropic",
+    "quantization": "unknown",
+    "stats": {
+     "endpoint_id": "a6a218f6-0bca-440c-98b5-66bccd2f9480",
+     "p50_latency": 3811,
+     "p50_throughput": 57,
+     "p75_latency": 4900.25,
+     "p75_throughput": 73,
+     "p90_latency": 5971,
+     "p90_throughput": 89,
+     "p95_latency": 7023.049999999998,
+     "p95_throughput": 101,
+     "p99_latency": 10044.380000000012,
+     "p99_throughput": 115,
+     "request_count": 13300,
+     "window_minutes": 30
+    },
+    "statsByTier": {
+     "default": {
+      "endpoint_id": "a6a218f6-0bca-440c-98b5-66bccd2f9480",
+      "p50_latency": 3825.5,
+      "p50_throughput": 57,
+      "p75_latency": 4913,
+      "p75_throughput": 73.25,
+      "p90_latency": 5951,
+      "p90_throughput": 89,
+      "p95_latency": 7030.9,
+      "p95_throughput": 101,
+      "p99_latency": 10177.590000000007,
+      "p99_throughput": 114.09000000000015,
+      "request_count": 13291,
+      "window_minutes": 30
+     }
+    },
+    "status": 0,
+    "status_heuristics": {
+     "derankableError": 0,
+     "rateLimited": 0,
+     "success": 2261
+    },
+    "status_heuristics_1d": {
+     "derankableError": 690,
+     "rateLimited": 0,
+     "success": 152917
+    },
+    "status_heuristics_5m": {
+     "derankableError": 0,
+     "rateLimited": 0,
+     "success": 267
+    },
+    "supported_image_parameters": null,
+    "supported_parameters": [
+     "max_tokens",
+     "stop",
+     "reasoning",
+     "include_reasoning",
+     "tool_choice",
+     "tools",
+     "structured_outputs",
+     "response_format",
+     "verbosity"
+    ],
+    "supported_video_parameters": null,
+    "supports_multipart": true,
+    "supports_reasoning": true,
+    "supports_tool_parameters": true,
+    "variant": "standard"
+   }
+  ]
+ },
+ "deepseek/deepseek-v4-flash-20260423": {
+  "data": [
+   {
+    "adapter_name": "DeepInfraAdapter",
+    "allowed_passthrough_parameters": [],
+    "can_abort": true,
+    "capacity_tpm": null,
+    "context_length": 1048576,
+    "created_at": "2026-04-24T07:21:11.064Z",
+    "data_policy": {
+     "canPublish": false,
+     "privacyPolicyURL": "https://deepinfra.com/privacy",
+     "retainsPrompts": false,
+     "termsOfServiceURL": "https://deepinfra.com/terms",
+     "training": false,
+     "trainingOpenRouter": false
+    },
+    "deprecation_date": null,
+    "display_pricing": [
+     {
+      "displayMultiplier": 1000000,
+      "kind": "token",
+      "price": "0.00000009",
+      "sku_label": "Input Price",
+      "unitLabel": "/M tokens"
+     },
+     {
+      "displayMultiplier": 1000000,
+      "kind": "token",
+      "price": "0.00000018",
+      "sku_label": "Output Price",
+      "unitLabel": "/M tokens"
+     },
+     {
+      "displayMultiplier": 1000000,
+      "kind": "token",
+      "price": "0.000000018",
+      "sku_label": "Cache Read",
+      "unitLabel": "/M tokens"
+     }
+    ],
+    "excluded_parameters": [],
+    "features": {
+     "supports_tool_choice": {
+      "literal_auto": true,
+      "literal_none": false,
+      "literal_required": true,
+      "type_function": true
+     }
+    },
+    "has_chat_completions": true,
+    "has_completions": true,
+    "id": "934a69f9-bd54-474b-beca-24560f721e12",
+    "is_byok": false,
+    "is_byok_only": false,
+    "is_deranked": false,
+    "is_disabled": false,
+    "is_free": false,
+    "is_hidden": false,
+    "is_private": false,
+    "limit_rpd": null,
+    "limit_rpm": null,
+    "limit_rpm_cf": null,
+    "max_completion_tokens": 65536,
+    "max_prompt_tokens": null,
+    "max_tokens_per_image": null,
+    "model": {
+     "author": "deepseek",
+     "author_display_name": "DeepSeek",
+     "author_flagship_modalities": [],
+     "context_length": 1048576,
+     "created_at": "2026-04-24T03:17:46.710737+00:00",
+     "default_order": [],
+     "default_parameters": {
+      "frequency_penalty": null,
+      "presence_penalty": null,
+      "repetition_penalty": null,
+      "temperature": null,
+      "top_k": null,
+      "top_p": null
+     },
+     "default_stops": [],
+     "default_system": null,
+     "description": "DeepSeek V4 Flash is an efficiency-optimized Mixture-of-Experts model from DeepSeek with 284B total parameters and 13B activated parameters, supporting a 1M-token context window. It is designed for fast inference and high-throughput workloads, while maintaining strong reasoning and coding performance.\n\nThe model includes hybrid attention for efficient long-context processing. Reasoning efforts `high` and `xhigh` are supported; `xhigh` maps to max reasoning. It is well suited for applications such as coding assistants, chat systems, and agent workflows where responsiveness and cost efficiency are important.",
+     "features": {
+      "chat_template_config": {},
+      "reasoning_config": {
+       "default_reasoning_effort": "high",
+       "end_token": "</think>",
+       "is_mandatory_reasoning": false,
+       "reasoning_return_mechanism": "reasoning-content",
+       "start_token": "<think>",
+       "supported_reasoning_efforts": [
+        "high",
+        "xhigh"
+       ],
+       "supports_reasoning_effort": true
+      }
+     },
+     "group": "DeepSeek",
+     "has_text_output": true,
+     "hf_slug": "deepseek-ai/DeepSeek-V4-Flash",
+     "hf_updated_at": null,
+     "hidden": false,
+     "input_modalities": [
+      "text"
+     ],
+     "instruct_type": null,
+     "is_private": false,
+     "is_trainable_image": null,
+     "is_trainable_text": true,
+     "knowledge_cutoff": null,
+     "limit_rpd": 0,
+     "limit_rpm": 0,
+     "model_version_group_id": null,
+     "name": "DeepSeek: DeepSeek V4 Flash",
+     "output_modalities": [
+      "text"
+     ],
+     "permaslug": "deepseek/deepseek-v4-flash-20260423",
+     "preview_audio": null,
+     "preview_thumbnail_url": null,
+     "previews_by_modality": {},
+     "promotion_message": null,
+     "quick_start_example_type": "reasoning",
+     "reasoning_config": {
+      "default_reasoning_effort": "high",
+      "end_token": "</think>",
+      "is_mandatory_reasoning": false,
+      "reasoning_return_mechanism": "reasoning-content",
+      "start_token": "<think>",
+      "supported_reasoning_efforts": [
+       "high",
+       "xhigh"
+      ],
+      "supports_reasoning_effort": true
+     },
+     "required_attestation_types": [],
+     "router": null,
+     "routing_error_message": null,
+     "short_name": "DeepSeek V4 Flash",
+     "slug": "deepseek/deepseek-v4-flash",
+     "supported_tts_voices": null,
+     "supports_reasoning": true,
+     "updated_at": "2026-07-31T07:34:52.211974+00:00",
+     "warning_message": null
+    },
+    "model_variant_permaslug": "deepseek/deepseek-v4-flash-20260423",
+    "model_variant_slug": "deepseek/deepseek-v4-flash",
+    "moderation_required": false,
+    "name": "DeepInfra | deepseek/deepseek-v4-flash-20260423",
+    "pricing": {
+     "completion": "0.00000018",
+     "discount": 0,
+     "display_pricing": [
+      {
+       "displayMultiplier": 1000000,
+       "kind": "token",
+       "price": "0.00000009",
+       "sku_label": "Input Price",
+       "unitLabel": "/M tokens"
+      },
+      {
+       "displayMultiplier": 1000000,
+       "kind": "token",
+       "price": "0.00000018",
+       "sku_label": "Output Price",
+       "unitLabel": "/M tokens"
+      },
+      {
+       "displayMultiplier": 1000000,
+       "kind": "token",
+       "price": "0.000000018",
+       "sku_label": "Cache Read",
+       "unitLabel": "/M tokens"
+      }
+     ],
+     "input_cache_read": "0.000000018",
+     "prompt": "0.00000009"
+    },
+    "pricing_json": {
+     "openai:cached_prompt_tokens": "0.000000018",
+     "openai:completion_tokens": "0.00000018",
+     "openai:prompt_tokens": "0.00000009"
+    },
+    "pricing_version_id": "1fc8481e-536e-4d90-8e2a-49cdee539bf6",
+    "provider_display_name": "DeepInfra",
+    "provider_info": {
+     "adapterName": "DeepInfraAdapter",
+     "baseUrl": "https://api.deepinfra.com/v1/openai",
+     "byokEnabled": true,
+     "dataPolicy": {
+      "canPublish": false,
+      "privacyPolicyURL": "https://deepinfra.com/privacy",
+      "requiresUserIDs": false,
+      "retainsPrompts": false,
+      "termsOfServiceURL": "https://deepinfra.com/terms",
+      "training": false,
+      "trainingOpenRouter": false
+     },
+     "displayName": "DeepInfra",
+     "editors": [
+      "{}"
+     ],
+     "hasChatCompletions": true,
+     "hasCompletions": true,
+     "headquarters": "US",
+     "icon": {
+      "url": "/images/icons/DeepInfra.webp"
+     },
+     "isAbortable": true,
+     "moderationRequired": false,
+     "name": "DeepInfra",
+     "owners": [
+      "{}",
+      "org_38GSfr7NVq111kyg6iXh1TTpKuz"
+     ],
+     "pricingStrategy": "openai_chat_completions",
+     "sendClientIp": false,
+     "slug": "deepinfra",
+     "statusPageUrl": "https://status.deepinfra.com/"
+    },
+    "provider_model_id": "deepseek-ai/DeepSeek-V4-Flash",
+    "provider_name": "DeepInfra",
+    "provider_region": null,
+    "provider_slug": "deepinfra/fp4",
+    "quantization": "fp4",
+    "stats": {
+     "endpoint_id": "934a69f9-bd54-474b-beca-24560f721e12",
+     "p50_latency": 764,
+     "p50_throughput": 34,
+     "p75_latency": 1109,
+     "p75_throughput": 41,
+     "p90_latency": 1808.9000000000005,
+     "p90_throughput": 49,
+     "p95_latency": 2986.8499999999976,
+     "p95_throughput": 54,
+     "p99_latency": 7864.430000000004,
+     "p99_throughput": 65,
+     "request_count": 442477,
+     "window_minutes": 30
+    },
+    "statsByTier": {
+     "default": {
+      "endpoint_id": "934a69f9-bd54-474b-beca-24560f721e12",
+      "p50_latency": 764,
+      "p50_throughput": 34,
+      "p75_latency": 1105,
+      "p75_throughput": 41,
+      "p90_latency": 1822.9000000000005,
+      "p90_throughput": 49,
+      "p95_latency": 3051.699999999999,
+      "p95_throughput": 54,
+      "p99_latency": 7827.1600000000035,
+      "p99_throughput": 64,
+      "request_count": 442409,
+      "window_minutes": 30
+     }
+    },
+    "status": 0,
+    "status_heuristics": {
+     "derankableError": 1096,
+     "rateLimited": 16617,
+     "success": 145435
+    },
+    "status_heuristics_1d": {
+     "derankableError": 45460,
+     "rateLimited": 1317826,
+     "success": 4739925
+    },
+    "status_heuristics_5m": {
+     "derankableError": 151,
+     "rateLimited": 1716,
+     "success": 18314
+    },
+    "supported_image_parameters": null,
+    "supported_parameters": [
+     "reasoning",
+     "include_reasoning",
+     "max_tokens",
+     "temperature",
+     "top_p",
+     "stop",
+     "frequency_penalty",
+     "presence_penalty",
+     "repetition_penalty",
+     "top_k",
+     "seed",
+     "min_p",
+     "response_format",
+     "tools",
+     "tool_choice",
+     "structured_outputs",
+     "logit_bias"
+    ],
+    "supported_video_parameters": {
+     "generate_audio": null,
+     "seed": null,
+     "supported_frame_images": null,
+     "supported_sizes": null
+    },
+    "supports_multipart": true,
+    "supports_reasoning": true,
+    "supports_tool_parameters": true,
+    "variant": "standard"
+   },
+   {
+    "adapter_name": "StreamLakeAdapter",
+    "allowed_passthrough_parameters": [],
+    "can_abort": true,
+    "capacity_tpm": null,
+    "context_length": 1024000,
+    "created_at": "2026-05-18T07:42:09.922Z",
+    "data_policy": {
+     "canPublish": false,
+     "privacyPolicyURL": "https://www.streamlake.ai/document/DOC/mgkci47q13qr66h9i54",
+     "retainsPrompts": true,
+     "termsOfServiceURL": "https://www.streamlake.ai/document/DOC/mgkchnd89grpt1961fw",
+     "training": false,
+     "trainingOpenRouter": false
+    },
+    "deprecation_date": null,
+    "display_pricing": [
+     {
+      "displayMultiplier": 1000000,
+      "kind": "token",
+      "price": "0.0000000924",
+      "sku_label": "Input Price",
+      "unitLabel": "/M tokens"
+     },
+     {
+      "displayMultiplier": 1000000,
+      "kind": "token",
+      "price": "0.0000001848",
+      "sku_label": "Output Price",
+      "unitLabel": "/M tokens"
+     },
+     {
+      "displayMultiplier": 1000000,
+      "kind": "token",
+      "price": "0.00000001848",
+      "sku_label": "Cache Read",
+      "unitLabel": "/M tokens"
+     }
+    ],
+    "excluded_parameters": [],
+    "features": {
+     "supports_tool_choice": {
+      "literal_auto": true,
+      "literal_none": false,
+      "literal_required": false,
+      "type_function": false
+     }
+    },
+    "has_chat_completions": true,
+    "has_completions": false,
+    "id": "13515b01-fed6-4afb-a382-ca3b4d7d7b8b",
+    "is_byok": false,
+    "is_byok_only": false,
+    "is_deranked": false,
+    "is_disabled": false,
+    "is_free": false,
+    "is_hidden": false,
+    "is_private": false,
+    "limit_rpd": null,
+    "limit_rpm": null,
+    "limit_rpm_cf": null,
+    "max_completion_tokens": 384000,
+    "max_prompt_tokens": null,
+    "max_tokens_per_image": null,
+    "model": {
+     "author": "deepseek",
+     "author_display_name": "DeepSeek",
+     "author_flagship_modalities": [],
+     "context_length": 1048576,
+     "created_at": "2026-04-24T03:17:46.710737+00:00",
+     "default_order": [],
+     "default_parameters": {
+      "frequency_penalty": null,
+      "presence_penalty": null,
+      "repetition_penalty": null,
+      "temperature": null,
+      "top_k": null,
+      "top_p": null
+     },
+     "default_stops": [],
+     "default_system": null,
+     "description": "DeepSeek V4 Flash is an efficiency-optimized Mixture-of-Experts model from DeepSeek with 284B total parameters and 13B activated parameters, supporting a 1M-token context window. It is designed for fast inference and high-throughput workloads, while maintaining strong reasoning and coding performance.\n\nThe model includes hybrid attention for efficient long-context processing. Reasoning efforts `high` and `xhigh` are supported; `xhigh` maps to max reasoning. It is well suited for applications such as coding assistants, chat systems, and agent workflows where responsiveness and cost efficiency are important.",
+     "features": {
+      "chat_template_config": {},
+      "reasoning_config": {
+       "default_reasoning_effort": "high",
+       "end_token": "</think>",
+       "is_mandatory_reasoning": false,
+       "reasoning_return_mechanism": "reasoning-content",
+       "start_token": "<think>",
+       "supported_reasoning_efforts": [
+        "high",
+        "xhigh"
+       ],
+       "supports_reasoning_effort": true
+      }
+     },
+     "group": "DeepSeek",
+     "has_text_output": true,
+     "hf_slug": "deepseek-ai/DeepSeek-V4-Flash",
+     "hf_updated_at": null,
+     "hidden": false,
+     "input_modalities": [
+      "text"
+     ],
+     "instruct_type": null,
+     "is_private": false,
+     "is_trainable_image": null,
+     "is_trainable_text": true,
+     "knowledge_cutoff": null,
+     "limit_rpd": 0,
+     "limit_rpm": 0,
+     "model_version_group_id": null,
+     "name": "DeepSeek: DeepSeek V4 Flash",
+     "output_modalities": [
+      "text"
+     ],
+     "permaslug": "deepseek/deepseek-v4-flash-20260423",
+     "preview_audio": null,
+     "preview_thumbnail_url": null,
+     "previews_by_modality": {},
+     "promotion_message": null,
+     "quick_start_example_type": "reasoning",
+     "reasoning_config": {
+      "default_reasoning_effort": "high",
+      "end_token": "</think>",
+      "is_mandatory_reasoning": false,
+      "reasoning_return_mechanism": "reasoning-content",
+      "start_token": "<think>",
+      "supported_reasoning_efforts": [
+       "high",
+       "xhigh"
+      ],
+      "supports_reasoning_effort": true
+     },
+     "required_attestation_types": [],
+     "router": null,
+     "routing_error_message": null,
+     "short_name": "DeepSeek V4 Flash",
+     "slug": "deepseek/deepseek-v4-flash",
+     "supported_tts_voices": null,
+     "supports_reasoning": true,
+     "updated_at": "2026-07-31T07:34:52.211974+00:00",
+     "warning_message": null
+    },
+    "model_variant_permaslug": "deepseek/deepseek-v4-flash-20260423",
+    "model_variant_slug": "deepseek/deepseek-v4-flash",
+    "moderation_required": false,
+    "name": "StreamLake | deepseek/deepseek-v4-flash-20260423",
+    "pricing": {
+     "completion": "0.0000001848",
+     "discount": 0.34,
+     "display_pricing": [
+      {
+       "displayMultiplier": 1000000,
+       "kind": "token",
+       "price": "0.0000000924",
+       "sku_label": "Input Price",
+       "unitLabel": "/M tokens"
+      },
+      {
+       "displayMultiplier": 1000000,
+       "kind": "token",
+       "price": "0.0000001848",
+       "sku_label": "Output Price",
+       "unitLabel": "/M tokens"
+      },
+      {
+       "displayMultiplier": 1000000,
+       "kind": "token",
+       "price": "0.00000001848",
+       "sku_label": "Cache Read",
+       "unitLabel": "/M tokens"
+      }
+     ],
+     "input_cache_read": "0.00000001848",
+     "prompt": "0.0000000924"
+    },
+    "pricing_json": {
+     "openai:cached_prompt_tokens": "0.000000028",
+     "openai:completion_tokens": "0.00000028",
+     "openai:prompt_tokens": "0.00000014"
+    },
+    "pricing_version_id": "343b22f6-9dae-45e1-ab5e-b82c70e8a153",
+    "provider_display_name": "StreamLake",
+    "provider_info": {
+     "adapterName": "StreamLakeAdapter",
+     "baseUrl": "https://vanchin.streamlake.ai/api/gateway/v1/endpoints",
+     "byokEnabled": true,
+     "dataPolicy": {
+      "canPublish": false,
+      "privacyPolicyURL": "https://www.streamlake.ai/document/DOC/mgkci47q13qr66h9i54",
+      "requiresUserIDs": false,
+      "retainsPrompts": true,
+      "termsOfServiceURL": "https://www.streamlake.ai/document/DOC/mgkchnd89grpt1961fw",
+      "training": false,
+      "trainingOpenRouter": false
+     },
+     "datacenters": [],
+     "displayName": "StreamLake",
+     "editors": [],
+     "hasChatCompletions": true,
+     "hasCompletions": false,
+     "headquarters": "CN",
+     "icon": {
+      "url": "https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.streamlake.com/&size=256"
+     },
+     "isAbortable": true,
+     "moderationRequired": false,
+     "name": "StreamLake",
+     "owners": [
+      "user_3DybIw2UNLpEdimIV6wQg7DTdjh",
+      "org_3DydQb67kHQffhtjuQsypJb767B"
+     ],
+     "pricingStrategy": "openai_chat_completions",
+     "sendClientIp": false,
+     "slug": "streamlake",
+     "statusPageUrl": null
+    },
+    "provider_model_id": "deepseek-v4-flash",
+    "provider_name": "StreamLake",
+    "provider_region": null,
+    "provider_slug": "streamlake/fp8",
+    "quantization": "fp8",
+    "stats": {
+     "endpoint_id": "13515b01-fed6-4afb-a382-ca3b4d7d7b8b",
+     "p50_latency": 1636,
+     "p50_throughput": 29,
+     "p75_latency": 3035.25,
+     "p75_throughput": 41,
+     "p90_latency": 6334.100000000005,
+     "p90_throughput": 48,
+     "p95_latency": 8674.699999999999,
+     "p95_throughput": 53,
+     "p99_latency": 15416.630000000001,
+     "p99_throughput": 61,
+     "request_count": 159854,
+     "window_minutes": 30
+    },
+    "statsByTier": {
+     "default": {
+      "endpoint_id": "13515b01-fed6-4afb-a382-ca3b4d7d7b8b",
+      "p50_latency": 1627,
+      "p50_throughput": 30,
+      "p75_latency": 2963.5,
+      "p75_throughput": 41,
+      "p90_latency": 6042,
+      "p90_throughput": 49,
+      "p95_latency": 8415.45,
+      "p95_throughput": 53,
+      "p99_latency": 14184.450000000015,
+      "p99_throughput": 60,
+      "request_count": 159807,
+      "window_minutes": 30
+     }
+    },
+    "status": 0,
+    "status_heuristics": {
+     "derankableError": 855,
+     "rateLimited": 11721,
+     "success": 133294
+    },
+    "status_heuristics_1d": {
+     "derankableError": 85231,
+     "rateLimited": 733600,
+     "success": 7913856
+    },
+    "status_heuristics_5m": {
+     "derankableError": 63,
+     "rateLimited": 704,
+     "success": 17475
+    },
+    "supported_image_parameters": null,
+    "supported_parameters": [
+     "reasoning",
+     "include_reasoning",
+     "max_tokens",
+     "temperature",
+     "top_p",
+     "frequency_penalty",
+     "stop",
+     "response_format",
+     "tools",
+     "tool_choice",
+     "logprobs",
+     "top_logprobs",
+     "structured_outputs"
+    ],
+    "supported_video_parameters": null,
+    "supports_multipart": true,
+    "supports_reasoning": true,
+    "supports_tool_parameters": true,
+    "variant": "standard"
+   },
+   {
+    "adapter_name": "GMICloudAdapter",
+    "allowed_passthrough_parameters": [],
+    "can_abort": true,
+    "capacity_tpm": null,
+    "context_length": 1048575,
+    "created_at": "2026-04-28T20:42:28.952Z",
+    "data_policy": {
+     "canPublish": false,
+     "privacyPolicyURL": "https://docs.gmicloud.ai/privacy",
+     "retainsPrompts": true,
+     "termsOfServiceURL": "https://www.gmicloud.ai/terms-and-conditions",
+     "training": false,
+     "trainingOpenRouter": false
+    },
+    "deprecation_date": null,
+    "display_pricing": [
+     {
+      "displayMultiplier": 1000000,
+      "kind": "token",
+      "price": "0.0000000938",
+      "sku_label": "Input Price",
+      "unitLabel": "/M tokens"
+     },
+     {
+      "displayMultiplier": 1000000,
+      "kind": "token",
+      "price": "0.0000001876",
+      "sku_label": "Output Price",
+      "unitLabel": "/M tokens"
+     },
+     {
+      "displayMultiplier": 1000000,
+      "kind": "token",
+      "price": "0.00000001876",
+      "sku_label": "Cache Read",
+      "unitLabel": "/M tokens"
+     }
+    ],
+    "excluded_parameters": [],
+    "features": {
+     "supports_tool_choice": {
+      "literal_auto": true,
+      "literal_none": true,
+      "literal_required": false,
+      "type_function": false
+     }
+    },
+    "has_chat_completions": true,
+    "has_completions": true,
+    "id": "e9b742d8-f524-4795-8d84-0d5815e9b73b",
+    "is_byok": false,
+    "is_byok_only": false,
+    "is_deranked": false,
+    "is_disabled": false,
+    "is_free": false,
+    "is_hidden": false,
+    "is_private": false,
+    "limit_rpd": null,
+    "limit_rpm": null,
+    "limit_rpm_cf": null,
+    "max_completion_tokens": null,
+    "max_prompt_tokens": null,
+    "max_tokens_per_image": null,
+    "model": {
+     "author": "deepseek",
+     "author_display_name": "DeepSeek",
+     "author_flagship_modalities": [],
+     "context_length": 1048576,
+     "created_at": "2026-04-24T03:17:46.710737+00:00",
+     "default_order": [],
+     "default_parameters": {
+      "frequency_penalty": null,
+      "presence_penalty": null,
+      "repetition_penalty": null,
+      "temperature": null,
+      "top_k": null,
+      "top_p": null
+     },
+     "default_stops": [],
+     "default_system": null,
+     "description": "DeepSeek V4 Flash is an efficiency-optimized Mixture-of-Experts model from DeepSeek with 284B total parameters and 13B activated parameters, supporting a 1M-token context window. It is designed for fast inference and high-throughput workloads, while maintaining strong reasoning and coding performance.\n\nThe model includes hybrid attention for efficient long-context processing. Reasoning efforts `high` and `xhigh` are supported; `xhigh` maps to max reasoning. It is well suited for applications such as coding assistants, chat systems, and agent workflows where responsiveness and cost efficiency are important.",
+     "features": {
+      "chat_template_config": {},
+      "reasoning_config": {
+       "default_reasoning_effort": "high",
+       "end_token": "</think>",
+       "is_mandatory_reasoning": false,
+       "reasoning_return_mechanism": "reasoning-content",
+       "start_token": "<think>",
+       "supported_reasoning_efforts": [
+        "high",
+        "xhigh"
+       ],
+       "supports_reasoning_effort": true
+      }
+     },
+     "group": "DeepSeek",
+     "has_text_output": true,
+     "hf_slug": "deepseek-ai/DeepSeek-V4-Flash",
+     "hf_updated_at": null,
+     "hidden": false,
+     "input_modalities": [
+      "text"
+     ],
+     "instruct_type": null,
+     "is_private": false,
+     "is_trainable_image": null,
+     "is_trainable_text": true,
+     "knowledge_cutoff": null,
+     "limit_rpd": 0,
+     "limit_rpm": 0,
+     "model_version_group_id": null,
+     "name": "DeepSeek: DeepSeek V4 Flash",
+     "output_modalities": [
+      "text"
+     ],
+     "permaslug": "deepseek/deepseek-v4-flash-20260423",
+     "preview_audio": null,
+     "preview_thumbnail_url": null,
+     "previews_by_modality": {},
+     "promotion_message": null,
+     "quick_start_example_type": "reasoning",
+     "reasoning_config": {
+      "default_reasoning_effort": "high",
+      "end_token": "</think>",
+      "is_mandatory_reasoning": false,
+      "reasoning_return_mechanism": "reasoning-content",
+      "start_token": "<think>",
+      "supported_reasoning_efforts": [
+       "high",
+       "xhigh"
+      ],
+      "supports_reasoning_effort": true
+     },
+     "required_attestation_types": [],
+     "router": null,
+     "routing_error_message": null,
+     "short_name": "DeepSeek V4 Flash",
+     "slug": "deepseek/deepseek-v4-flash",
+     "supported_tts_voices": null,
+     "supports_reasoning": true,
+     "updated_at": "2026-07-31T07:34:52.211974+00:00",
+     "warning_message": null
+    },
+    "model_variant_permaslug": "deepseek/deepseek-v4-flash-20260423",
+    "model_variant_slug": "deepseek/deepseek-v4-flash",
+    "moderation_required": false,
+    "name": "GMICloud | deepseek/deepseek-v4-flash-20260423",
+    "pricing": {
+     "completion": "0.0000001876",
+     "discount": 0.33,
+     "display_pricing": [
+      {
+       "displayMultiplier": 1000000,
+       "kind": "token",
+       "price": "0.0000000938",
+       "sku_label": "Input Price",
+       "unitLabel": "/M tokens"
+      },
+      {
+       "displayMultiplier": 1000000,
+       "kind": "token",
+       "price": "0.0000001876",
+       "sku_label": "Output Price",
+       "unitLabel": "/M tokens"
+      },
+      {
+       "displayMultiplier": 1000000,
+       "kind": "token",
+       "price": "0.00000001876",
+       "sku_label": "Cache Read",
+       "unitLabel": "/M tokens"
+      }
+     ],
+     "input_cache_read": "0.00000001876",
+     "prompt": "0.0000000938"
+    },
+    "pricing_json": {
+     "openai:cached_prompt_tokens": "0.000000028",
+     "openai:completion_tokens": "0.00000028",
+     "openai:prompt_tokens": "0.00000014"
+    },
+    "pricing_version_id": "c500a186-f525-40bc-99fd-dca4db9e8bfc",
+    "provider_display_name": "GMICloud",
+    "provider_info": {
+     "adapterName": "GMICloudAdapter",
+     "baseUrl": "https://api.gmi-serving.com/v1",
+     "byokEnabled": true,
+     "dataPolicy": {
+      "canPublish": false,
+      "privacyPolicyURL": "https://docs.gmicloud.ai/privacy",
+      "requiresUserIDs": false,
+      "retainsPrompts": true,
+      "termsOfServiceURL": "https://www.gmicloud.ai/terms-and-conditions",
+      "training": false,
+      "trainingOpenRouter": false
+     },
+     "datacenters": [
+      "US"
+     ],
+     "displayName": "GMICloud",
+     "editors": [
+      "{}"
+     ],
+     "hasChatCompletions": true,
+     "hasCompletions": true,
+     "headquarters": "US",
+     "icon": {
+      "className": "invert-0 dark:invert",
+      "url": "https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://gmicloud.ai/&size=256"
+     },
+     "isAbortable": true,
+     "moderationRequired": false,
+     "name": "GMICloud",
+     "owners": [
+      "{}",
+      "org_3EumBkqgQ9nDJ3QUZxfQDsLuJ6S"
+     ],
+     "pricingStrategy": "openai_chat_completions",
+     "sendClientIp": false,
+     "slug": "gmicloud",
+     "statusPageUrl": null
+    },
+    "provider_model_id": "deepseek-ai/DeepSeek-V4-Flash",
+    "provider_name": "GMICloud",
+    "provider_region": null,
+    "provider_slug": "gmicloud/fp8",
+    "quantization": "fp8",
+    "stats": {
+     "endpoint_id": "e9b742d8-f524-4795-8d84-0d5815e9b73b",
+     "p50_latency": 2468,
+     "p50_throughput": 33,
+     "p75_latency": 3360,
+     "p75_throughput": 44,
+     "p90_latency": 5751.900000000001,
+     "p90_throughput": 78,
+     "p95_latency": 8668.649999999998,
+     "p95_throughput": 89.44999999999982,
+     "p99_latency": 28750.200000000026,
+     "p99_throughput": 104,
+     "request_count": 293255,
+     "window_minutes": 30
+    },
+    "statsByTier": {
+     "default": {
+      "endpoint_id": "e9b742d8-f524-4795-8d84-0d5815e9b73b",
+      "p50_latency": 2454,
+      "p50_throughput": 33,
+      "p75_latency": 3343,
+      "p75_throughput": 44,
+      "p90_latency": 5636.900000000001,
+      "p90_throughput": 78,
+      "p95_latency": 8442.599999999995,
+      "p95_throughput": 90,
+      "p99_latency": 27801.48000000004,
+      "p99_throughput": 104,
+      "request_count": 293243,
+      "window_minutes": 30
+     }
+    },
+    "status": 0,
+    "status_heuristics": {
+     "derankableError": 2137,
+     "rateLimited": 58,
+     "success": 229599
+    },
+    "status_heuristics_1d": {
+     "derankableError": 343698,
+     "rateLimited": 2448,
+     "success": 13656184
+    },
+    "status_heuristics_5m": {
+     "derankableError": 128,
+     "rateLimited": 11,
+     "success": 28953
+    },
+    "supported_image_parameters": null,
+    "supported_parameters": [
+     "reasoning",
+     "include_reasoning",
+     "max_tokens",
+     "temperature",
+     "top_p",
+     "seed",
+     "tools",
+     "tool_choice",
+     "response_format"
+    ],
+    "supported_video_parameters": null,
+    "supports_multipart": true,
+    "supports_reasoning": true,
+    "supports_tool_parameters": true,
+    "variant": "standard"
+   }
+  ]
+ },
+ "meta-llama/llama-guard-4-12b": {
+  "data": [
+   {
+    "adapter_name": "DeepInfraAdapter",
+    "allowed_passthrough_parameters": [],
+    "can_abort": true,
+    "capacity_tpm": null,
+    "context_length": 163840,
+    "created_at": "2025-04-30T01:08:17.980Z",
+    "data_policy": {
+     "canPublish": false,
+     "privacyPolicyURL": "https://deepinfra.com/privacy",
+     "retainsPrompts": false,
+     "termsOfServiceURL": "https://deepinfra.com/terms",
+     "training": false,
+     "trainingOpenRouter": false
+    },
+    "deprecation_date": null,
+    "display_pricing": [
+     {
+      "displayMultiplier": 1000000,
+      "kind": "token",
+      "price": "0.00000018",
+      "sku_label": "Input Price",
+      "unitLabel": "/M tokens"
+     },
+     {
+      "displayMultiplier": 1000000,
+      "kind": "token",
+      "price": "0.00000018",
+      "sku_label": "Output Price",
+      "unitLabel": "/M tokens"
+     }
+    ],
+    "excluded_parameters": [],
+    "features": {
+     "supported_parameters": {},
+     "supports_tool_choice": {
+      "literal_auto": true,
+      "literal_none": true,
+      "literal_required": true,
+      "type_function": true
+     }
+    },
+    "has_chat_completions": true,
+    "has_completions": true,
+    "id": "850b84c3-42a7-4cec-99c0-b5582d0da66b",
+    "is_byok": false,
+    "is_byok_only": false,
+    "is_deranked": false,
+    "is_disabled": false,
+    "is_free": false,
+    "is_hidden": false,
+    "is_private": false,
+    "limit_rpd": null,
+    "limit_rpm": null,
+    "limit_rpm_cf": null,
+    "max_completion_tokens": 16384,
+    "max_prompt_tokens": null,
+    "max_tokens_per_image": null,
+    "model": {
+     "author": "meta-llama",
+     "author_display_name": "Meta Llama",
+     "author_flagship_modalities": [],
+     "context_length": 163840,
+     "created_at": "2025-04-30T01:06:33.531556+00:00",
+     "default_order": [],
+     "default_parameters": {},
+     "default_stops": [],
+     "default_system": null,
+     "description": "Llama Guard 4 is a Llama 4 Scout-derived multimodal pretrained model, fine-tuned for content safety classification. Similar to previous versions, it can be used to classify content in both LLM inputs (prompt classification) and in LLM responses (response classification). It acts as an LLM\u2014generating text in its output that indicates whether a given prompt or response is safe or unsafe, and if unsafe, it also lists the content categories violated.\n\nLlama Guard 4 was aligned to safeguard against the standardized MLCommons hazards taxonomy and designed to support multimodal Llama 4 capabilities. Specifically, it combines features from previous Llama Guard models, providing content moderation for English and multiple supported languages, along with enhanced capabilities to handle mixed text-and-image prompts, including multiple images. Additionally, Llama Guard 4 is integrated into the Llama Moderations API, extending robust safety classification to text and images.",
+     "features": {},
+     "group": "Other",
+     "has_text_output": true,
+     "hf_slug": "meta-llama/Llama-Guard-4-12B",
+     "hf_updated_at": null,
+     "hidden": false,
+     "input_modalities": [
+      "image",
+      "text"
+     ],
+     "instruct_type": null,
+     "is_private": false,
+     "is_trainable_image": null,
+     "is_trainable_text": true,
+     "knowledge_cutoff": "2024-08-31T23:59:59+00:00",
+     "limit_rpd": null,
+     "limit_rpm": null,
+     "model_version_group_id": null,
+     "name": "Meta: Llama Guard 4 12B",
+     "output_modalities": [
+      "text"
+     ],
+     "permaslug": "meta-llama/llama-guard-4-12b",
+     "preview_audio": null,
+     "preview_thumbnail_url": null,
+     "previews_by_modality": {},
+     "promotion_message": null,
+     "quick_start_example_type": null,
+     "reasoning_config": null,
+     "required_attestation_types": [],
+     "router": null,
+     "routing_error_message": null,
+     "short_name": "Llama Guard 4 12B",
+     "slug": "meta-llama/llama-guard-4-12b",
+     "supported_tts_voices": null,
+     "supports_reasoning": false,
+     "updated_at": "2026-03-24T19:43:16.801719+00:00",
+     "warning_message": null
+    },
+    "model_variant_permaslug": "meta-llama/llama-guard-4-12b",
+    "model_variant_slug": "meta-llama/llama-guard-4-12b",
+    "moderation_required": false,
+    "name": "DeepInfra | meta-llama/llama-guard-4-12b",
+    "pricing": {
+     "completion": "0.00000018",
+     "discount": 0,
+     "display_pricing": [
+      {
+       "displayMultiplier": 1000000,
+       "kind": "token",
+       "price": "0.00000018",
+       "sku_label": "Input Price",
+       "unitLabel": "/M tokens"
+      },
+      {
+       "displayMultiplier": 1000000,
+       "kind": "token",
+       "price": "0.00000018",
+       "sku_label": "Output Price",
+       "unitLabel": "/M tokens"
+      }
+     ],
+     "prompt": "0.00000018"
+    },
+    "pricing_json": {
+     "openai:completion_tokens": "0.00000018",
+     "openai:prompt_tokens": "0.00000018"
+    },
+    "pricing_version_id": "48e5a11b-06e3-4455-a22f-3a3af4cea914",
+    "provider_display_name": "DeepInfra",
+    "provider_info": {
+     "adapterName": "DeepInfraAdapter",
+     "baseUrl": "https://api.deepinfra.com/v1/openai",
+     "byokEnabled": true,
+     "dataPolicy": {
+      "canPublish": false,
+      "privacyPolicyURL": "https://deepinfra.com/privacy",
+      "requiresUserIDs": false,
+      "retainsPrompts": false,
+      "termsOfServiceURL": "https://deepinfra.com/terms",
+      "training": false,
+      "trainingOpenRouter": false
+     },
+     "displayName": "DeepInfra",
+     "editors": [
+      "{}"
+     ],
+     "hasChatCompletions": true,
+     "hasCompletions": true,
+     "headquarters": "US",
+     "icon": {
+      "url": "/images/icons/DeepInfra.webp"
+     },
+     "isAbortable": true,
+     "moderationRequired": false,
+     "name": "DeepInfra",
+     "owners": [
+      "{}",
+      "org_38GSfr7NVq111kyg6iXh1TTpKuz"
+     ],
+     "pricingStrategy": "openai_chat_completions",
+     "sendClientIp": false,
+     "slug": "deepinfra",
+     "statusPageUrl": "https://status.deepinfra.com/"
+    },
+    "provider_model_id": "meta-llama/Llama-Guard-4-12B",
+    "provider_name": "DeepInfra",
+    "provider_region": null,
+    "provider_slug": "deepinfra/bf16",
+    "quantization": "bf16",
+    "stats": {
+     "endpoint_id": "850b84c3-42a7-4cec-99c0-b5582d0da66b",
+     "p50_latency": 354,
+     "p50_throughput": 8,
+     "p75_latency": 560,
+     "p75_throughput": 11,
+     "p90_latency": 931,
+     "p90_throughput": 17,
+     "p95_latency": 1286,
+     "p95_throughput": 20,
+     "p99_latency": 2532.000000000002,
+     "p99_throughput": 25.600000000000364,
+     "request_count": 7941,
+     "window_minutes": 30
+    },
+    "statsByTier": {
+     "default": {
+      "endpoint_id": "850b84c3-42a7-4cec-99c0-b5582d0da66b",
+      "p50_latency": 354,
+      "p50_throughput": 8,
+      "p75_latency": 559.75,
+      "p75_throughput": 11,
+      "p90_latency": 931,
+      "p90_throughput": 17,
+      "p95_latency": 1286.3499999999995,
+      "p95_throughput": 20,
+      "p99_latency": 2532.3500000000004,
+      "p99_throughput": 25.670000000000073,
+      "request_count": 7934,
+      "window_minutes": 30
+     }
+    },
+    "status": 0,
+    "status_heuristics": {
+     "derankableError": 15,
+     "rateLimited": 0,
+     "success": 7650
+    },
+    "status_heuristics_1d": {
+     "derankableError": 3305,
+     "rateLimited": 1186,
+     "success": 392085
+    },
+    "status_heuristics_5m": {
+     "derankableError": 1,
+     "rateLimited": 0,
+     "success": 1268
+    },
+    "supported_image_parameters": null,
+    "supported_parameters": [
+     "max_tokens",
+     "temperature",
+     "top_p",
+     "stop",
+     "frequency_penalty",
+     "presence_penalty",
+     "repetition_penalty",
+     "top_k",
+     "seed",
+     "min_p",
+     "response_format",
+     "logit_bias"
+    ],
+    "supported_video_parameters": null,
+    "supports_multipart": true,
+    "supports_reasoning": false,
+    "supports_tool_parameters": false,
+    "variant": "standard"
+   },
+   {
+    "adapter_name": "TogetherAdapter",
+    "allowed_passthrough_parameters": [],
+    "can_abort": true,
+    "capacity_tpm": null,
+    "context_length": 1048576,
+    "created_at": "2025-05-03T17:10:45.379Z",
+    "data_policy": {
+     "canPublish": false,
+     "privacyPolicyURL": "https://www.together.ai/privacy",
+     "retainsPrompts": false,
+     "termsOfServiceURL": "https://www.together.ai/terms-of-service",
+     "training": false,
+     "trainingOpenRouter": false
+    },
+    "deprecation_date": null,
+    "display_pricing": [
+     {
+      "displayMultiplier": 1000000,
+      "kind": "token",
+      "price": "0.0000002",
+      "sku_label": "Input Price",
+      "unitLabel": "/M tokens"
+     },
+     {
+      "displayMultiplier": 1000000,
+      "kind": "token",
+      "price": "0.0000002",
+      "sku_label": "Output Price",
+      "unitLabel": "/M tokens"
+     }
+    ],
+    "excluded_parameters": [],
+    "features": {
+     "supported_parameters": {},
+     "supports_tool_choice": {
+      "literal_auto": true,
+      "literal_none": true,
+      "literal_required": true,
+      "type_function": true
+     }
+    },
+    "has_chat_completions": true,
+    "has_completions": true,
+    "id": "4864c772-7e6a-4fe8-bfc1-40bbaa3a27fd",
+    "is_byok": false,
+    "is_byok_only": false,
+    "is_deranked": false,
+    "is_disabled": false,
+    "is_free": false,
+    "is_hidden": false,
+    "is_private": false,
+    "limit_rpd": null,
+    "limit_rpm": null,
+    "limit_rpm_cf": null,
+    "max_completion_tokens": null,
+    "max_prompt_tokens": null,
+    "max_tokens_per_image": null,
+    "model": {
+     "author": "meta-llama",
+     "author_display_name": "Meta Llama",
+     "author_flagship_modalities": [],
+     "context_length": 163840,
+     "created_at": "2025-04-30T01:06:33.531556+00:00",
+     "default_order": [],
+     "default_parameters": {},
+     "default_stops": [],
+     "default_system": null,
+     "description": "Llama Guard 4 is a Llama 4 Scout-derived multimodal pretrained model, fine-tuned for content safety classification. Similar to previous versions, it can be used to classify content in both LLM inputs (prompt classification) and in LLM responses (response classification). It acts as an LLM\u2014generating text in its output that indicates whether a given prompt or response is safe or unsafe, and if unsafe, it also lists the content categories violated.\n\nLlama Guard 4 was aligned to safeguard against the standardized MLCommons hazards taxonomy and designed to support multimodal Llama 4 capabilities. Specifically, it combines features from previous Llama Guard models, providing content moderation for English and multiple supported languages, along with enhanced capabilities to handle mixed text-and-image prompts, including multiple images. Additionally, Llama Guard 4 is integrated into the Llama Moderations API, extending robust safety classification to text and images.",
+     "features": {},
+     "group": "Other",
+     "has_text_output": true,
+     "hf_slug": "meta-llama/Llama-Guard-4-12B",
+     "hf_updated_at": null,
+     "hidden": false,
+     "input_modalities": [
+      "image",
+      "text"
+     ],
+     "instruct_type": null,
+     "is_private": false,
+     "is_trainable_image": null,
+     "is_trainable_text": true,
+     "knowledge_cutoff": "2024-08-31T23:59:59+00:00",
+     "limit_rpd": null,
+     "limit_rpm": null,
+     "model_version_group_id": null,
+     "name": "Meta: Llama Guard 4 12B",
+     "output_modalities": [
+      "text"
+     ],
+     "permaslug": "meta-llama/llama-guard-4-12b",
+     "preview_audio": null,
+     "preview_thumbnail_url": null,
+     "previews_by_modality": {},
+     "promotion_message": null,
+     "quick_start_example_type": null,
+     "reasoning_config": null,
+     "required_attestation_types": [],
+     "router": null,
+     "routing_error_message": null,
+     "short_name": "Llama Guard 4 12B",
+     "slug": "meta-llama/llama-guard-4-12b",
+     "supported_tts_voices": null,
+     "supports_reasoning": false,
+     "updated_at": "2026-03-24T19:43:16.801719+00:00",
+     "warning_message": null
+    },
+    "model_variant_permaslug": "meta-llama/llama-guard-4-12b",
+    "model_variant_slug": "meta-llama/llama-guard-4-12b",
+    "moderation_required": false,
+    "name": "Together | meta-llama/llama-guard-4-12b",
+    "pricing": {
+     "completion": "0.0000002",
+     "discount": 0,
+     "display_pricing": [
+      {
+       "displayMultiplier": 1000000,
+       "kind": "token",
+       "price": "0.0000002",
+       "sku_label": "Input Price",
+       "unitLabel": "/M tokens"
+      },
+      {
+       "displayMultiplier": 1000000,
+       "kind": "token",
+       "price": "0.0000002",
+       "sku_label": "Output Price",
+       "unitLabel": "/M tokens"
+      }
+     ],
+     "prompt": "0.0000002"
+    },
+    "pricing_json": {
+     "openai:completion_tokens": "0.0000002",
+     "openai:prompt_tokens": "0.0000002"
+    },
+    "pricing_version_id": "f457831e-faea-47e1-b4d6-7efa3aa01564",
+    "provider_display_name": "Together",
+    "provider_info": {
+     "adapterName": "TogetherAdapter",
+     "baseUrl": "https://api.together.xyz/v1",
+     "byokEnabled": true,
+     "dataPolicy": {
+      "canPublish": false,
+      "privacyPolicyURL": "https://www.together.ai/privacy",
+      "requiresUserIDs": false,
+      "retainsPrompts": false,
+      "termsOfServiceURL": "https://www.together.ai/terms-of-service",
+      "training": false,
+      "trainingOpenRouter": false
+     },
+     "displayName": "Together",
+     "editors": [
+      "{}"
+     ],
+     "hasChatCompletions": true,
+     "hasCompletions": true,
+     "headquarters": "US",
+     "icon": {
+      "url": "https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.together.ai/&size=256"
+     },
+     "isAbortable": true,
+     "moderationRequired": false,
+     "name": "Together",
+     "owners": [
+      "{}",
+      "org_3Ao0BoKhwwioO3iArOjbkWR0jD0"
+     ],
+     "pricingStrategy": "openai_chat_completions",
+     "sendClientIp": false,
+     "slug": "together",
+     "statusPageUrl": "https://status.together.ai/"
+    },
+    "provider_model_id": "meta-llama/Llama-Guard-4-12B",
+    "provider_name": "Together",
+    "provider_region": null,
+    "provider_slug": "together",
+    "quantization": "unknown",
+    "stats": {
+     "endpoint_id": "4864c772-7e6a-4fe8-bfc1-40bbaa3a27fd",
+     "p50_latency": 182,
+     "p50_throughput": 12,
+     "p75_latency": 320,
+     "p75_throughput": 19,
+     "p90_latency": 580.6000000000004,
+     "p90_throughput": 29,
+     "p95_latency": 830.6000000000004,
+     "p95_throughput": 37,
+     "p99_latency": 1470.8799999999974,
+     "p99_throughput": 50,
+     "request_count": 6015,
+     "window_minutes": 30
+    },
+    "statsByTier": {
+     "default": {
+      "endpoint_id": "4864c772-7e6a-4fe8-bfc1-40bbaa3a27fd",
+      "p50_latency": 182,
+      "p50_throughput": 12,
+      "p75_latency": 320,
+      "p75_throughput": 19,
+      "p90_latency": 580.6000000000004,
+      "p90_throughput": 29,
+      "p95_latency": 830.6000000000004,
+      "p95_throughput": 37,
+      "p99_latency": 1470.8799999999974,
+      "p99_throughput": 50,
+      "request_count": 6015,
+      "window_minutes": 30
+     }
+    },
+    "status": 0,
+    "status_heuristics": {
+     "derankableError": 0,
+     "rateLimited": 0,
+     "success": 5776
+    },
+    "status_heuristics_1d": {
+     "derankableError": 1933,
+     "rateLimited": 24,
+     "success": 269148
+    },
+    "status_heuristics_5m": {
+     "derankableError": 0,
+     "rateLimited": 0,
+     "success": 937
+    },
+    "supported_image_parameters": null,
+    "supported_parameters": [
+     "max_tokens",
+     "temperature",
+     "top_p",
+     "stop",
+     "frequency_penalty",
+     "presence_penalty",
+     "top_k",
+     "repetition_penalty",
+     "logit_bias",
+     "min_p"
+    ],
+    "supported_video_parameters": null,
+    "supports_multipart": true,
+    "supports_reasoning": false,
+    "supports_tool_parameters": false,
+    "variant": "standard"
+   }
+  ]
+ }
+}

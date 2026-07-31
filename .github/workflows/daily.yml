@@ -1,0 +1,66 @@
+name: Daily capture
+
+# The public feed carries no history: it returns trailing aggregates, not a
+# series. This job is the only thing that turns it into one, and a day not
+# captured is a day lost forever -- which is why it commits its output.
+on:
+  schedule:
+    - cron: "17 6 * * *"   # 06:17 UTC, off the hour to avoid the stampede
+  workflow_dispatch:
+
+concurrency:
+  group: daily-capture
+  cancel-in-progress: false   # never abort a capture in flight
+
+permissions:
+  contents: write
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -e ".[dev]"
+
+      - name: Capture snapshot
+        env:
+          ORPULSE_USER_AGENT: >-
+            orpulse/0.1 (+https://github.com/${{ github.repository }};
+            public-data research; daily single capture)
+        run: python -m orpulse.cli ingest
+
+      - name: Rebuild marts and validate
+        run: python -m orpulse.cli build
+
+      - name: Regenerate findings
+        run: python -m orpulse.cli report
+
+      - name: Commit the day
+        run: |
+          git config user.name  "orpulse-bot"
+          git config user.email "actions@github.com"
+          git add data/raw data/marts docs/FINDINGS.md
+          if git diff --staged --quiet; then
+            echo "nothing changed; not committing"
+          else
+            git commit -m "capture: $(date -u +%Y-%m-%d)"
+            git push
+          fi
+
+      # Runs even if the build failed, so a bad day leaves a diagnosable trail
+      # rather than a silent gap.
+      - name: Upload manifests
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: manifests-${{ github.run_id }}
+          path: data/raw/**/_manifest.json
+          if-no-files-found: warn
+          retention-days: 90
