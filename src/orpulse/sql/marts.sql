@@ -368,4 +368,9 @@ LEFT JOIN live b
       -- Strictly better on at least one axis, so identical endpoints do not
       -- dominate each other symmetrically.
       AND (b.price_completion < a.price_completion OR b.p50_throughput > a.p50_throughput)
-GROUP BY ALL;
+GROUP BY ALL
+-- Deterministic order: DuckDB gives no ordering guarantee, and without a
+-- tiebreaker two endpoints tied on dominated_by_n swap places between runs,
+-- which makes the generated report differ from itself and defeats the CI check
+-- that it never goes stale.
+ORDER BY a.model_permaslug, a.endpoint_id;

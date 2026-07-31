@@ -256,7 +256,10 @@ Of {len(contested_rows):,} endpoints serving multi-provider models,
                     f"{_num(r.p50_throughput, 0)} tok/s",
                     r.dominant_provider or "—",
                     int(r.dominated_by_n),
-                ] for r in dominated.nlargest(8, "dominated_by_n").itertuples()],
+                ] for r in dominated.sort_values(
+                    # endpoint_id breaks ties so the report is reproducible.
+                    ["dominated_by_n", "endpoint_id"], ascending=[False, True]
+                ).head(8).itertuples()],
                 ["Model", "Dominated endpoint", "$/M out", "p50 throughput",
                  "Beaten by", "# better"],
             ))
