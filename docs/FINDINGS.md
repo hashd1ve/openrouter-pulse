@@ -125,7 +125,68 @@ size of the artefact the correction removes.
 | `mistralai/ministral-14b-2512` | 0.18× | 21.90 B | 241 | conversational |
 | `perceptron/perceptron-mk1-20260512` | 0.19× | 13.85 B | 80 | extractive |
 
-## 4. Secondary: Pareto-dominated provider endpoints
+## 4. Attention and money are different markets
+
+Multiplying each model's tokens by its list price gives the gross value its
+traffic represents: **$167.3 M per month** across
+351 priced model-variants.
+
+This is *not* revenue. It ignores prompt-cache discounts, batch pricing, BYOK
+traffic, negotiated rates and OpenRouter's own margin, so it is an upper bound —
+which is why the column is called `implied_gross_value` and never `revenue`.
+
+| Lab | Share of tokens | Share of implied value | Value per token of attention |
+|---|---|---|---|
+| `anthropic` | 11.9% | 44.9% | 3.77x |
+| `openai` | 6.9% | 15.7% | 2.27x |
+| `z-ai` | 6.9% | 10.9% | 1.58x |
+| `moonshotai` | 2.2% | 6.1% | 2.79x |
+| `deepseek` | 17.2% | 6.1% | 0.35x |
+| `google` | 8.1% | 4.5% | 0.56x |
+| `xiaomi` | 15.2% | 3.5% | 0.23x |
+| `tencent` | 12.2% | 2.3% | 0.19x |
+
+Concentration makes the same point without picking a winner. Measured by tokens,
+the labs sit at an HHI of **1,061**. Measured by money they sit at
+**2,501** — past the 2,500 mark competition authorities treat as
+highly concentrated — and the largest lab takes **44.9%** of
+the value against 17.2% of the tokens.
+
+The Gini coefficient across models is **0.935** by tokens
+and **0.933** by value. Both are extreme; a
+national income distribution above 0.6 is considered severe.
+
+
+### The sticker price is not the price
+
+Traffic is overwhelmingly prompt-heavy, and prompt tokens cost less than
+completions. Blended across each model's real token mix, the price actually paid
+per token is a median of **0.32x** the headline output price — the
+sticker overstates the true unit cost by about **3.1x**.
+
+This is the number a buyer comparing models on `$/M output` is getting wrong.
+
+
+## 5. The context window arms race is mostly unused
+
+Dividing mean tokens per request by the advertised context length asks how much
+of the window the traffic actually touches. Token-weighted across the market:
+**7.98%**.
+
+| Archetype | Median share of the advertised window used |
+|---|---|
+| **agentic** | 8.73% |
+| **conversational** | 1.90% |
+| **output_heavy** | 1.87% |
+| **extractive** | 1.68% |
+
+Even agentic traffic — the workload that exists *because* of long context — uses
+under a tenth of what it is sold. One caveat, and it cuts one way: tokens per
+request is a mean, so a model that occasionally fills a million-token window and
+usually does not still reads low. This bounds typical usage, not peak capability.
+
+
+## 6. The serving layer: Pareto-dominated endpoints
 
 For models served by more than one provider, an endpoint is *dominated* when
 another endpoint for the same model is both cheaper per completion token and
@@ -151,7 +212,7 @@ it does not settle the question. Repeated captures are what turn this into
 evidence.
 
 
-## 5. Is the classification stable?
+## 7. Is the classification stable?
 
 Fixed thresholds only beat clustering if the resulting labels hold still. That
 is measurable rather than assumable, so it is measured: the share of models that
@@ -162,7 +223,78 @@ change archetype between consecutive captures.
 > The metric is built and will populate on the next capture.
 
 
-## 6. What this cannot tell you
+## 8. Price response, and where it hides
+
+Regressing log tokens on log price with heteroskedasticity-robust (HC1) standard
+errors — robust rather than classical because token volume spans nine orders of
+magnitude and classical errors would claim confidence the data cannot support.
+
+Two weightings, because they answer different questions. Unweighted treats every
+model as one observation. Request-weighted follows where the traffic actually is.
+
+| Segment | Weighting | Elasticity | 95% CI | R² | n | Clears zero |
+|---|---|---|---|---|---|---|
+| **agentic** | request weighted | -0.47 | -0.67 to -0.26 | 0.367 | 48 | yes |
+| **all** | request weighted | -0.12 | -0.51 to +0.27 | 0.007 | 323 | no |
+| **conversational** | request weighted | -0.22 | -0.70 to +0.25 | 0.020 | 219 | no |
+| **extractive** | request weighted | -0.26 | -1.31 to +0.79 | 0.034 | 20 | no |
+| **output_heavy** | request weighted | +0.10 | -0.17 to +0.36 | 0.015 | 36 | no |
+| **agentic** | unweighted | -0.08 | -0.62 to +0.47 | 0.002 | 48 | no |
+| **all** | unweighted | -0.49 | -0.75 to -0.23 | 0.036 | 323 | yes |
+| **conversational** | unweighted | -0.69 | -1.01 to -0.36 | 0.078 | 219 | yes |
+| **extractive** | unweighted | -0.04 | -0.52 to +0.44 | 0.001 | 20 | no |
+| **output_heavy** | unweighted | -0.67 | -1.19 to -0.14 | 0.047 | 36 | yes |
+
+**The result worth the space is the reversal in agentic traffic.** Counting
+models equally, price explains nothing (-0.08, interval
+-0.62 to +0.47, straddling zero). Weighting by requests, the
+elasticity is **-0.47** (-0.67 to -0.26) and
+clears zero comfortably.
+
+Agentic *models* are not price-sensitive. Agentic *volume* is. That is the
+signature of a small number of very large consumers optimising unit cost hard,
+and it is invisible to any analysis that treats each model as one data point.
+
+**This is not a causal elasticity.** It is a cross-section of different models at
+different prices, not one model observed at several prices, so it absorbs
+everything that makes cheap models cheap — smaller, weaker, newer. A steep slope
+is as consistent with "buyers chase cheap tokens" as with "cheap models are the
+ones built for bulk work". The comparison *between* archetypes carries more than
+any single coefficient.
+
+
+## 9. How long does a model live? (preliminary)
+
+Kaplan-Meier with right-censoring. Most models are still running, so their
+lifetime is known only to be *at least* their current age: dropping them would
+bias the curve towards short lives, counting their age as a lifetime would bias
+it the other way, and the product-limit estimator uses exactly what each subject
+carries. The implementation reproduces the published curve for the Freireich
+leukemia trial, which is what `tests/test_analytics.py` asserts.
+
+| Death defined as | Events | Censored | Alive at 180d | Alive at 365d |
+|---|---|---|---|---|
+| ≥2 days silent | 33 | 320 | 94.4% | 88.5% |
+| ≥3 days silent | 15 | 338 | 98.1% | 94.6% |
+| ≥7 days silent | 11 | 342 | 98.8% | 96.6% |
+| ≥14 days silent | 1 | 352 | 100.0% | 99.2% |
+
+**Why this is labelled preliminary.** Death is inferred from the last day with
+traffic, and two biases pull against each other. A model silent for more than
+about 30 days leaves the monthly window entirely, so long-dead models are absent
+and survival is biased *up* — the giveaway is in the table, where a 14-day
+threshold finds almost no events at all, which is a property of the feed rather
+than of the market. Meanwhile a 2-day threshold books a model that merely had a
+quiet Tuesday as dead, biasing *down*. Their relative magnitudes are unknown.
+
+What fixes it costs nothing but time. Once the archive holds several weeks of
+captures, death is *observed* — present on day N, absent on day N+k — instead of
+inferred from a truncated field. The estimator does not change; its input stops
+being biased. This is the clearest case in the project of a metric that only a
+growing archive can make real.
+
+
+## 10. What this cannot tell you
 
 Stating the limits is part of the result.
 

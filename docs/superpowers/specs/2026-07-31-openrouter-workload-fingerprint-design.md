@@ -72,13 +72,17 @@ Cabe entero en un repositorio git sin infraestructura externa.
 - Validación de calidad de datos que rompe el pipeline
 - Tests unitarios, de contrato y de calidad
 - Informe generado desde los datos
-- Dashboard de exploración
+- Dashboard estático autocontenido (un solo HTML, SVG en línea, sin servidor ni dependencias)
+- Métricas avanzadas: economía implícita, estructura de mercado (HHI/Gini), utilización de contexto, competencia entre proveedores, elasticidad precio, canibalización de variantes
+- Estimadores estadísticos propios y verificados: Kaplan-Meier con censura, OLS con errores robustos HC1
 - Cron diario en GitHub Actions
 
 **Fuera, deliberadamente:**
 - Detección de revisiones retroactivas de cifras. Saldría casi gratis de los datos que ya se guardan, pero no hace falta para la tesis y no tendría material hasta pasadas semanas.
 - Orquestador dedicado (Airflow/Dagster). Para 0,6 MB/día sería un error de dimensionamiento.
 - Base de datos servidor. El dataset cabe en memoria varias veces.
+- Framework de dashboard (Streamlit/Dash). Se descartó tras evaluarlo: obliga a mantener un servidor vivo para algo cuyo destino natural es un enlace, y añade dependencias de runtime que envejecen. Un HTML autocontenido con SVG en línea se abre en cualquier sitio, sobrevive a una política de seguridad estricta y no tiene nada que actualizar.
+- Utilización de capacidad de proveedor. `capacity_tpm` solo viene informado en 18 de 925 endpoints: no da para nada.
 
 ## 4. Arquitectura
 

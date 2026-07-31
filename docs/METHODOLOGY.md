@@ -194,7 +194,139 @@ that test failing is good news, not a regression.
 
 ---
 
-## 7. What this cannot tell you
+## 7. Implied gross value
+
+```
+implied_gross_value = prompt_tokens × price_prompt + completion_tokens × price_completion
+```
+
+**It is not revenue, and the column name says so.** It uses each model's
+headline price and therefore ignores prompt-cache discounts, batch pricing, BYOK
+traffic, negotiated rates and OpenRouter's own margin. It is an upper bound on
+the economic weight of a model's traffic. Calling it `revenue` anywhere would
+have invited every downstream reader to forget that, so it is called
+`implied_gross_value` in the SQL, in the Parquet, and in the report.
+
+Models without a published price are **excluded, not zeroed**: an unknown price
+is not a price of zero, and 144 of 497 model-variants would otherwise silently
+drag the total down.
+
+### The blended-versus-sticker ratio
+
+Traffic is overwhelmingly prompt-heavy, and prompt tokens cost less than
+completions. So the price a buyer actually pays per token, blended across their
+real mix, sits well below the headline output price:
+
+```
+blended_price_per_token   = implied_gross_value / total_tokens
+blended_to_sticker_ratio  = blended_price_per_token / price_completion
+```
+
+Median observed: **0.32**, i.e. the sticker overstates the true unit cost by
+about 3.1×. This is the number a buyer comparing models on `$/M output` is
+getting wrong, and it varies by model precisely because the P:C mix does.
+
+## 8. Concentration
+
+Three measures, because each hides something the others show:
+
+- **HHI**, on the 0–10,000 scale competition authorities use. Above 2,500 is
+  conventionally "highly concentrated".
+- **Gini**, which is insensitive to how the mass is split among the leaders but
+  sensitive to the long tail.
+- **Top-N share**, which is the one a non-specialist reads correctly.
+
+Each is computed over four different bases — tokens by model, value by model,
+tokens by lab, value by lab — because *the choice of base is the finding*. By
+tokens the labs look moderately concentrated (HHI ≈ 1,061); by money they cross
+2,500. A single concentration number would have hidden exactly the thing worth
+reporting.
+
+## 9. Context-window utilisation
+
+```
+mean_window_utilisation = tokens_per_request / context_length
+```
+
+The asymmetry matters: `tokens_per_request` is a **mean over the month**, so a
+model whose median request is small but which occasionally fills a million-token
+window still reads low. The metric bounds *typical* usage, not peak capability,
+and the column is named `mean_window_utilisation` rather than `window_usage` for
+that reason.
+
+## 10. Price elasticity
+
+Log tokens regressed on log price with **HC1 heteroskedasticity-robust** standard
+errors. Robust rather than classical because token volume spans nine orders of
+magnitude; classical errors would report confidence the data cannot support.
+
+Two weightings are reported side by side because they answer different questions:
+unweighted treats every model as one observation; request-weighted follows where
+the traffic actually is.
+
+### A statistical trap that had to be fixed
+
+Weighted least squares here is done by scaling both sides by √w. The R² that
+falls out of that fit is computed on the *scaled* response, whose total sum of
+squares is dominated by the spread of the weights rather than by the
+relationship — it came out at 0.99 for every segment, which is meaningless. It
+is recomputed on the original scale against the **weighted mean**:
+
+```
+R²_w = 1 − Σ w(y − ŷ)² / Σ w(y − ȳ_w)²
+```
+
+After the fix the same regressions report 0.007 to 0.367, which is what the data
+actually supports. `tests/test_analytics.py` asserts that deliberately noisy
+input cannot produce a high weighted R².
+
+### What the estimate is not
+
+**Not causal.** It is a cross-section of different models at different prices,
+not one model observed at several prices, so it absorbs everything that makes
+cheap models cheap — smaller, weaker, newer. A steep slope is as consistent with
+"buyers chase cheap tokens" as with "cheap models are the ones built for bulk
+work". The differences *between* archetypes carry more than any single
+coefficient, and the headline result is one of those differences: agentic
+elasticity is indistinguishable from zero unweighted and clearly negative
+request-weighted. Agentic models are not price-sensitive; agentic volume is.
+
+## 11. Survival analysis
+
+Kaplan-Meier product-limit estimator with right-censoring and Greenwood
+variance; the confidence band uses the **log-log transform**, which keeps the
+interval inside [0, 1] where the plain Greenwood interval routinely produces
+bounds above 1 near the tail.
+
+Implemented directly rather than imported. The verification is the point: the
+implementation reproduces the published survival curve of the Freireich
+leukemia trial (6-MP arm) to within 5 × 10⁻⁴ at every event time, and recovers
+its published median of 23 weeks.
+
+### Why the application is preliminary even though the estimator is not
+
+Death has to be *inferred* from `source_last_activity_date`, and two biases pull
+in opposite directions:
+
+1. **Right truncation.** A model silent for more than ~30 days leaves the
+   monthly window entirely, so long-dead models are absent from the sample
+   altogether. Every subject is conditioned on recent presence, biasing survival
+   **up**. The tell is in the sensitivity table: at a 14-day threshold there is
+   essentially one event, and at 30 days none — a property of the feed, not of
+   the market.
+2. **Resurrection.** At a 2-day threshold, a model that merely had a quiet
+   Tuesday is booked as dead, biasing survival **down**.
+
+Their relative magnitudes are unknown, so the curve is published as a
+demonstration of method rather than as a finding, with the sensitivity across
+thresholds shown rather than a single number.
+
+**What fixes it costs nothing but time.** Once the archive holds several weeks
+of captures, death is *observed* — present on day N, absent on day N+k — instead
+of inferred from a truncated field. The estimator does not change; its input
+stops being biased.
+
+## 12. What this cannot tell you
 
 - **Traffic is not users.** One agentic application can outproduce a million
   chat sessions. Nothing here measures adoption, revenue, or satisfaction.
@@ -212,12 +344,12 @@ that test failing is good news, not a regression.
 
 ---
 
-## 8. Reproducing any figure
+## 13. Reproducing any figure
 
 ```bash
-make build     # rebuilds staging and marts from data/raw, runs quality checks
-make report    # regenerates FINDINGS.md from the marts
-make app       # opens the dashboard on the same marts
+make build      # rebuilds staging + SQL marts + statistical marts, runs quality checks
+make report     # regenerates FINDINGS.md from the marts
+make dashboard  # regenerates the self-contained HTML dashboard from the same marts
 ```
 
 Every published number is read from `data/marts/*.parquet`, which are derived

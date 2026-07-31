@@ -18,7 +18,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
 
-      - run: pip install -e ".[app,dev]"
+      - run: pip install -e ".[dev]"
 
       # Unit, mart and dashboard tests. No network: they run against frozen
       # fixtures, so a change in OpenRouter's API can never turn this red.
@@ -30,5 +30,7 @@ jobs:
         run: |
           python -m orpulse.cli build
           python -m orpulse.cli report
-          git diff --exit-code docs/FINDINGS.md \
-            || (echo "::error::FINDINGS.md is stale; run 'make report' and commit" && exit 1)
+          python -m orpulse.cli dashboard
+          git diff --exit-code docs/FINDINGS.md docs/dashboard.html \
+            || (echo "::error::generated docs are stale; run 'make report dashboard' and commit" \
+                && exit 1)

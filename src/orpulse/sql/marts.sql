@@ -388,3 +388,246 @@ GROUP BY ALL
 -- which makes the generated report differ from itself and defeats the CI check
 -- that it never goes stale.
 ORDER BY a.model_permaslug, a.endpoint_id;
+
+
+-- =====================================================================
+-- ADVANCED MARTS
+--
+-- Everything below is set-based and therefore belongs in SQL. The
+-- estimators that are NOT set-based -- Kaplan-Meier survival with
+-- censoring, robust regression, concentration indices -- live in
+-- orpulse/analytics.py and are materialised by orpulse/derive.py.
+-- =====================================================================
+
+
+-- ---------------------------------------------------------------------
+-- mart_model_economics
+--
+-- What the traffic is WORTH, not just how big it is. Token share and
+-- money share turn out to be almost unrelated.
+--
+-- HONESTY: this is gross list-price value, not revenue. It multiplies
+-- tokens by the model's headline price and therefore ignores prompt
+-- caching discounts, batch pricing, BYOK traffic, negotiated rates, and
+-- OpenRouter's own margin. It is an upper bound on the economic weight
+-- of a model's traffic, and is named `implied_gross_value` -- never
+-- `revenue` -- so nobody downstream forgets that.
+-- ---------------------------------------------------------------------
+CREATE OR REPLACE TABLE mart_model_economics AS
+WITH priced AS (
+    SELECT
+        snapshot_date,
+        model_permaslug,
+        variant,
+        name,
+        author,
+        archetype,
+        month_tokens,
+        month_prompt_tokens,
+        month_completion_tokens,
+        month_requests,
+        pc_ratio,
+        tokens_per_request,
+        price_prompt,
+        price_completion,
+        context_length,
+        month_prompt_tokens * price_prompt
+            + month_completion_tokens * price_completion AS implied_gross_value
+    FROM mart_model_fingerprint
+    WHERE price_prompt IS NOT NULL
+      AND price_completion IS NOT NULL
+      AND month_tokens > 0
+)
+SELECT
+    *,
+    implied_gross_value / nullif(month_tokens, 0)   AS blended_price_per_token,
+    implied_gross_value / nullif(month_requests, 0) AS cost_per_request,
+    month_tokens::DOUBLE
+        / nullif(sum(month_tokens) OVER (PARTITION BY snapshot_date), 0) AS token_share,
+    implied_gross_value
+        / nullif(sum(implied_gross_value) OVER (PARTITION BY snapshot_date), 0) AS value_share,
+    -- How far the sticker price overstates what a token actually costs on
+    -- average. A model whose traffic is 100:1 prompt-heavy bills mostly at the
+    -- cheaper input rate, so its blended cost sits far below its headline
+    -- output price. This is the number a buyer actually pays.
+    (implied_gross_value / nullif(month_tokens, 0))
+        / nullif(price_completion, 0) AS blended_to_sticker_ratio,
+    row_number() OVER (PARTITION BY snapshot_date ORDER BY month_tokens DESC,
+                       model_permaslug, variant) AS token_rank,
+    row_number() OVER (PARTITION BY snapshot_date ORDER BY implied_gross_value DESC,
+                       model_permaslug, variant) AS value_rank
+FROM priced
+ORDER BY snapshot_date, model_permaslug, variant;
+
+
+-- ---------------------------------------------------------------------
+-- mart_context_utilization
+--
+-- Vendors compete on advertised context windows. This asks how much of
+-- the window the traffic actually touches.
+--
+-- Note the asymmetry: tokens_per_request is a MEAN over the month, so a
+-- model whose median request is tiny but which occasionally fills a 1M
+-- window will still show a low ratio. The metric bounds typical usage,
+-- not peak capability, and is named accordingly.
+-- ---------------------------------------------------------------------
+CREATE OR REPLACE TABLE mart_context_utilization AS
+SELECT
+    snapshot_date,
+    model_permaslug,
+    variant,
+    author,
+    archetype,
+    context_length,
+    tokens_per_request,
+    month_tokens,
+    month_requests,
+    tokens_per_request / nullif(context_length, 0) AS mean_window_utilisation,
+    -- How many times over the advertised window could the month's traffic
+    -- have filled it. A crude measure of whether the window is the binding
+    -- constraint on the workload at all.
+    month_tokens::DOUBLE / nullif(context_length, 0) AS window_equivalents
+FROM mart_model_fingerprint
+WHERE context_length > 0
+  AND tokens_per_request IS NOT NULL
+ORDER BY snapshot_date, model_permaslug, variant;
+
+
+-- ---------------------------------------------------------------------
+-- mart_provider_competition
+--
+-- Per model, how contested is the serving layer?
+--
+-- `stat_request_count` is the only per-endpoint traffic signal available,
+-- and it covers a 30-minute window. It is used here as a SHARE (each
+-- endpoint's slice of that model's requests in the same window), which is
+-- far more robust than its absolute level -- but a model whose providers
+-- have different traffic rhythms will still be measured mid-rhythm.
+-- ---------------------------------------------------------------------
+CREATE OR REPLACE TABLE mart_provider_competition AS
+WITH live AS (
+    SELECT *
+    FROM fct_endpoint_perf_snapshot
+    WHERE coalesce(is_disabled, FALSE) = FALSE
+      AND snapshot_date = (SELECT max(snapshot_date) FROM fct_endpoint_perf_snapshot)
+),
+shares AS (
+    SELECT
+        *,
+        stat_request_count::DOUBLE / nullif(
+            sum(stat_request_count) OVER (PARTITION BY model_permaslug), 0
+        ) AS request_share
+    FROM live
+)
+SELECT
+    snapshot_date,
+    model_permaslug,
+    count(*)                                            AS n_endpoints,
+    count(DISTINCT provider_name)                       AS n_providers,
+    -- HHI on the 0-10,000 scale competition authorities use.
+    sum(coalesce(request_share, 0) ^ 2) * 10000         AS provider_hhi,
+    max(request_share)                                  AS leader_share,
+    arg_max(provider_name, coalesce(request_share, -1)) AS leading_provider,
+    min(price_completion)                               AS min_price_completion,
+    max(price_completion)                               AS max_price_completion,
+    max(price_completion) / nullif(min(price_completion), 0) AS price_spread_ratio,
+    min(p50_throughput)                                 AS min_throughput,
+    max(p50_throughput)                                 AS max_throughput,
+    -- Tail-to-median latency: how consistent the serving is, not how fast.
+    -- A provider can be quick on average and still miss deadlines.
+    median(p99_latency / nullif(p50_latency, 0))        AS jitter_index,
+    sum(stat_request_count)                             AS window_requests
+FROM shares
+GROUP BY snapshot_date, model_permaslug
+HAVING count(*) > 0
+ORDER BY model_permaslug;
+
+
+-- ---------------------------------------------------------------------
+-- mart_provider_scoreboard
+--
+-- The same data pivoted to the provider. Who serves the most models, how
+-- consistently, and at what position on price.
+-- ---------------------------------------------------------------------
+CREATE OR REPLACE TABLE mart_provider_scoreboard AS
+WITH live AS (
+    SELECT *
+    FROM fct_endpoint_perf_snapshot
+    WHERE coalesce(is_disabled, FALSE) = FALSE
+      AND snapshot_date = (SELECT max(snapshot_date) FROM fct_endpoint_perf_snapshot)
+),
+ranked AS (
+    -- Where this endpoint sits on price among everyone serving the same
+    -- model. 0 = cheapest, 1 = dearest. Comparable across models in a way
+    -- that a raw price never is.
+    SELECT
+        l.*,
+        -- quantization is a slowly-changing endpoint attribute, so it lives on
+        -- the dimension rather than being repeated in every snapshot row.
+        d.quantization,
+        percent_rank() OVER (
+            PARTITION BY l.model_permaslug ORDER BY l.price_completion
+        ) AS price_percentile,
+        percent_rank() OVER (
+            PARTITION BY l.model_permaslug ORDER BY l.p50_throughput
+        ) AS speed_percentile
+    FROM live l
+    LEFT JOIN dim_endpoint d USING (endpoint_id)
+)
+SELECT
+    r.snapshot_date,
+    r.provider_name,
+    count(*)                                   AS n_endpoints,
+    count(DISTINCT r.model_permaslug)          AS n_models,
+    sum(r.stat_request_count)                  AS window_requests,
+    median(r.p50_throughput)                   AS median_throughput,
+    median(r.p50_latency)                      AS median_latency,
+    median(r.p99_latency / nullif(r.p50_latency, 0)) AS jitter_index,
+    -- Only meaningful where the model has more than one server.
+    median(CASE WHEN c.n_endpoints > 1 THEN r.price_percentile END) AS median_price_percentile,
+    median(CASE WHEN c.n_endpoints > 1 THEN r.speed_percentile END) AS median_speed_percentile,
+    count(DISTINCT r.quantization)             AS n_quantizations,
+    sum(CASE WHEN r.is_deranked THEN 1 ELSE 0 END) AS n_deranked
+FROM ranked r
+JOIN mart_provider_competition c USING (model_permaslug)
+GROUP BY r.snapshot_date, r.provider_name
+ORDER BY window_requests DESC NULLS LAST, provider_name;
+
+
+-- ---------------------------------------------------------------------
+-- mart_variant_economics
+--
+-- 28 models ship both a free and a paid variant. What share of their
+-- traffic never bills, and does the free tier look like a funnel or like
+-- a substitute?
+-- ---------------------------------------------------------------------
+CREATE OR REPLACE TABLE mart_variant_economics AS
+WITH by_variant AS (
+    SELECT
+        snapshot_date,
+        model_permaslug,
+        sum(CASE WHEN variant = 'standard' THEN month_tokens ELSE 0 END) AS standard_tokens,
+        sum(CASE WHEN variant = 'free'     THEN month_tokens ELSE 0 END) AS free_tokens,
+        sum(CASE WHEN variant = 'batch'    THEN month_tokens ELSE 0 END) AS batch_tokens,
+        sum(CASE WHEN variant = 'standard' THEN month_requests ELSE 0 END) AS standard_requests,
+        sum(CASE WHEN variant = 'free'     THEN month_requests ELSE 0 END) AS free_requests,
+        sum(month_tokens)   AS total_tokens,
+        count(*)            AS n_variants,
+        arg_max(archetype, month_tokens) AS archetype,
+        arg_max(author, month_tokens)    AS author
+    FROM mart_model_fingerprint
+    GROUP BY snapshot_date, model_permaslug
+)
+SELECT
+    *,
+    free_tokens::DOUBLE  / nullif(total_tokens, 0) AS free_token_share,
+    batch_tokens::DOUBLE / nullif(total_tokens, 0) AS batch_token_share,
+    -- Tokens per request on the free tier against the paid tier. A funnel
+    -- would show similar shapes; a substitute shows the free tier absorbing
+    -- the small, cheap interactions and leaving the heavy ones to the paid one.
+    (free_tokens::DOUBLE / nullif(free_requests, 0))
+        / nullif(standard_tokens::DOUBLE / nullif(standard_requests, 0), 0)
+        AS free_to_paid_intensity
+FROM by_variant
+WHERE n_variants > 1
+ORDER BY snapshot_date, model_permaslug;

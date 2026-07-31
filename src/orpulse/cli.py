@@ -6,7 +6,7 @@ import argparse
 import logging
 import sys
 
-from . import config, ingest, quality, report, transform
+from . import config, dashboard, derive, ingest, quality, report, transform
 
 
 def _setup_logging(verbose: bool) -> None:
@@ -33,6 +33,9 @@ def cmd_ingest(args) -> int:
 def cmd_build(args) -> int:
     staging = transform.build_staging()
     transform.build_marts(staging)
+    # Statistical marts depend on the SQL ones, so they run second and are
+    # reloaded together before validation.
+    derive.build_all(transform.load_marts())
     marts = transform.load_marts()
     results = quality.run_all(marts)
     print()
@@ -67,6 +70,15 @@ def cmd_report(args) -> int:
         return 1
     path = report.write(marts)
     print(f"wrote {path}")
+    return 0
+
+
+def cmd_dashboard(args) -> int:
+    marts = transform.load_marts()
+    if not marts:
+        print("no marts found; run `make build` first", file=sys.stderr)
+        return 1
+    print(f"wrote {dashboard.write(marts)}")
     return 0
 
 
@@ -112,6 +124,9 @@ def main(argv: list[str] | None = None) -> int:
 
     p = sub.add_parser("report", help="regenerate docs/FINDINGS.md from the marts")
     p.set_defaults(func=cmd_report)
+
+    p = sub.add_parser("dashboard", help="build the self-contained HTML dashboard")
+    p.set_defaults(func=cmd_dashboard)
 
     p = sub.add_parser("snapshots", help="list completed snapshots")
     p.set_defaults(func=cmd_snapshots)

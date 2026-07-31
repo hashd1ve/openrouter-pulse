@@ -230,6 +230,98 @@ size of the artefact the correction removes.
             ["Model", "Momentum", "Tokens (30d)", "Age (days)", "Archetype"],
         ))
 
+    # --- 3b. economics ------------------------------------------------------
+    econ = marts.get("mart_model_economics", pd.DataFrame())
+    structure = marts.get("mart_market_structure", pd.DataFrame())
+    if not econ.empty:
+        econ = econ[econ["snapshot_date"] == econ["snapshot_date"].max()]
+        total_value = econ["implied_gross_value"].sum()
+        by_author = (econ.groupby("author")
+                     .agg(tokens=("month_tokens", "sum"),
+                          value=("implied_gross_value", "sum"))
+                     .assign(token_share=lambda d: d.tokens / d.tokens.sum(),
+                             value_share=lambda d: d.value / d.value.sum())
+                     .nlargest(8, "value_share"))
+        blended = econ["blended_to_sticker_ratio"].median()
+
+        add(f"""
+## 4. Attention and money are different markets
+
+Multiplying each model's tokens by its list price gives the gross value its
+traffic represents: **${total_value / 1e6:,.1f} M per month** across
+{len(econ):,} priced model-variants.
+
+This is *not* revenue. It ignores prompt-cache discounts, batch pricing, BYOK
+traffic, negotiated rates and OpenRouter's own margin, so it is an upper bound —
+which is why the column is called `implied_gross_value` and never `revenue`.
+""")
+        add(_table(
+            [[
+                f"`{a}`",
+                f"{r.token_share:.1%}",
+                f"{r.value_share:.1%}",
+                f"{r.value_share / r.token_share:.2f}x" if r.token_share else "—",
+            ] for a, r in by_author.iterrows()],
+            ["Lab", "Share of tokens", "Share of implied value", "Value per token of attention"],
+        ))
+
+        def _row(measure):
+            s = structure[(structure["measure"] == measure)
+                          & (structure["segment"] == "all")]
+            return s.iloc[0] if len(s) else None
+
+        tok_a, val_a = _row("tokens_by_author"), _row("implied_value_by_author")
+        if tok_a is not None and val_a is not None:
+            add(f"""
+Concentration makes the same point without picking a winner. Measured by tokens,
+the labs sit at an HHI of **{tok_a['hhi']:,.0f}**. Measured by money they sit at
+**{val_a['hhi']:,.0f}** — past the 2,500 mark competition authorities treat as
+highly concentrated — and the largest lab takes **{val_a['top1_share']:.1%}** of
+the value against {tok_a['top1_share']:.1%} of the tokens.
+
+The Gini coefficient across models is **{_row('tokens')['gini']:.3f}** by tokens
+and **{_row('implied_value')['gini']:.3f}** by value. Both are extreme; a
+national income distribution above 0.6 is considered severe.
+""")
+        add(f"""
+### The sticker price is not the price
+
+Traffic is overwhelmingly prompt-heavy, and prompt tokens cost less than
+completions. Blended across each model's real token mix, the price actually paid
+per token is a median of **{blended:.2f}x** the headline output price — the
+sticker overstates the true unit cost by about **{1 / blended:.1f}x**.
+
+This is the number a buyer comparing models on `$/M output` is getting wrong.
+""")
+
+    # --- 3c. context utilisation --------------------------------------------
+    ctx = marts.get("mart_context_utilization", pd.DataFrame())
+    if not ctx.empty:
+        ctx = ctx[ctx["snapshot_date"] == ctx["snapshot_date"].max()]
+        weighted = (ctx["mean_window_utilisation"].fillna(0)
+                    * ctx["month_tokens"].clip(lower=0)).sum() / max(
+                        ctx["month_tokens"].clip(lower=0).sum(), 1)
+        by_arch = (ctx[ctx["archetype"] != "unclassified"]
+                   .groupby("archetype")["mean_window_utilisation"]
+                   .median().dropna().sort_values(ascending=False))
+        add(f"""
+## 5. The context window arms race is mostly unused
+
+Dividing mean tokens per request by the advertised context length asks how much
+of the window the traffic actually touches. Token-weighted across the market:
+**{weighted:.2%}**.
+""")
+        add(_table(
+            [[f"**{a}**", f"{v:.2%}"] for a, v in by_arch.items()],
+            ["Archetype", "Median share of the advertised window used"],
+        ))
+        add("""
+Even agentic traffic — the workload that exists *because* of long context — uses
+under a tenth of what it is sold. One caveat, and it cuts one way: tokens per
+request is a mean, so a model that occasionally fills a million-token window and
+usually does not still reads low. This bounds typical usage, not peak capability.
+""")
+
     # --- 4. price / performance -------------------------------------------
     pp = marts.get("mart_endpoint_price_perf", pd.DataFrame())
     if not pp.empty:
@@ -238,7 +330,7 @@ size of the artefact the correction removes.
         contested = multi[multi > 1].index
         contested_rows = pp[pp["model_permaslug"].isin(contested)]
         add(f"""
-## 4. Secondary: Pareto-dominated provider endpoints
+## 6. The serving layer: Pareto-dominated endpoints
 
 For models served by more than one provider, an endpoint is *dominated* when
 another endpoint for the same model is both cheaper per completion token and
@@ -273,7 +365,7 @@ evidence.
     # --- 5. stability ------------------------------------------------------
     stab = marts.get("mart_archetype_stability", pd.DataFrame())
     add("""
-## 5. Is the classification stable?
+## 7. Is the classification stable?
 
 Fixed thresholds only beat clustering if the resulting labels hold still. That
 is measurable rather than assumable, so it is measured: the share of models that
@@ -292,9 +384,97 @@ Between `{last['prev_snapshot_date']}` and `{last['snapshot_date']}`,
 models changed archetype (target: under 5%).
 """)
 
+    # --- 5b. elasticity -----------------------------------------------------
+    el = marts.get("mart_price_elasticity", pd.DataFrame())
+    if not el.empty:
+        el = el[el["snapshot_date"] == el["snapshot_date"].max()]
+        add("""
+## 8. Price response, and where it hides
+
+Regressing log tokens on log price with heteroskedasticity-robust (HC1) standard
+errors — robust rather than classical because token volume spans nine orders of
+magnitude and classical errors would claim confidence the data cannot support.
+
+Two weightings, because they answer different questions. Unweighted treats every
+model as one observation. Request-weighted follows where the traffic actually is.
+""")
+        add(_table(
+            [[
+                f"**{r.segment}**",
+                r.weighting.replace("_", " "),
+                f"{r.elasticity:+.2f}",
+                f"{r.ci_low:+.2f} to {r.ci_high:+.2f}",
+                f"{r.r_squared:.3f}",
+                f"{r.n:,}",
+                "yes" if r.significant_at_95 else "no",
+            ] for r in el.sort_values(["weighting", "segment"]).itertuples()],
+            ["Segment", "Weighting", "Elasticity", "95% CI", "R²", "n", "Clears zero"],
+        ))
+        ag = el[(el["segment"] == "agentic") & (el["weighting"] == "request_weighted")]
+        agu = el[(el["segment"] == "agentic") & (el["weighting"] == "unweighted")]
+        if len(ag) and len(agu):
+            a, u = ag.iloc[0], agu.iloc[0]
+            add(f"""
+**The result worth the space is the reversal in agentic traffic.** Counting
+models equally, price explains nothing ({u.elasticity:+.2f}, interval
+{u.ci_low:+.2f} to {u.ci_high:+.2f}, straddling zero). Weighting by requests, the
+elasticity is **{a.elasticity:+.2f}** ({a.ci_low:+.2f} to {a.ci_high:+.2f}) and
+clears zero comfortably.
+
+Agentic *models* are not price-sensitive. Agentic *volume* is. That is the
+signature of a small number of very large consumers optimising unit cost hard,
+and it is invisible to any analysis that treats each model as one data point.
+
+**This is not a causal elasticity.** It is a cross-section of different models at
+different prices, not one model observed at several prices, so it absorbs
+everything that makes cheap models cheap — smaller, weaker, newer. A steep slope
+is as consistent with "buyers chase cheap tokens" as with "cheap models are the
+ones built for bulk work". The comparison *between* archetypes carries more than
+any single coefficient.
+""")
+
+    # --- 5c. survival --------------------------------------------------------
+    sens = marts.get("mart_survival_sensitivity", pd.DataFrame())
+    if not sens.empty:
+        add("""
+## 9. How long does a model live? (preliminary)
+
+Kaplan-Meier with right-censoring. Most models are still running, so their
+lifetime is known only to be *at least* their current age: dropping them would
+bias the curve towards short lives, counting their age as a lifetime would bias
+it the other way, and the product-limit estimator uses exactly what each subject
+carries. The implementation reproduces the published curve for the Freireich
+leukemia trial, which is what `tests/test_analytics.py` asserts.
+""")
+        add(_table(
+            [[
+                f"≥{int(r.threshold_days)} days silent",
+                f"{int(r.n_events):,}",
+                f"{int(r.n_censored):,}",
+                f"{r.survival_at_180d:.1%}",
+                f"{r.survival_at_365d:.1%}",
+            ] for r in sens.sort_values("threshold_days").itertuples()],
+            ["Death defined as", "Events", "Censored", "Alive at 180d", "Alive at 365d"],
+        ))
+        add("""
+**Why this is labelled preliminary.** Death is inferred from the last day with
+traffic, and two biases pull against each other. A model silent for more than
+about 30 days leaves the monthly window entirely, so long-dead models are absent
+and survival is biased *up* — the giveaway is in the table, where a 14-day
+threshold finds almost no events at all, which is a property of the feed rather
+than of the market. Meanwhile a 2-day threshold books a model that merely had a
+quiet Tuesday as dead, biasing *down*. Their relative magnitudes are unknown.
+
+What fixes it costs nothing but time. Once the archive holds several weeks of
+captures, death is *observed* — present on day N, absent on day N+k — instead of
+inferred from a truncated field. The estimator does not change; its input stops
+being biased. This is the clearest case in the project of a metric that only a
+growing archive can make real.
+""")
+
     # --- 6. limitations ----------------------------------------------------
     add(f"""
-## 6. What this cannot tell you
+## 10. What this cannot tell you
 
 Stating the limits is part of the result.
 

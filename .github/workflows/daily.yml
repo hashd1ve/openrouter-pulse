@@ -39,14 +39,16 @@ jobs:
       - name: Rebuild marts and validate
         run: python -m orpulse.cli build
 
-      - name: Regenerate findings
-        run: python -m orpulse.cli report
+      - name: Regenerate findings and dashboard
+        run: |
+          python -m orpulse.cli report
+          python -m orpulse.cli dashboard
 
       - name: Commit the day
         run: |
           git config user.name  "orpulse-bot"
           git config user.email "actions@github.com"
-          git add data/raw data/marts docs/FINDINGS.md
+          git add data/raw data/marts docs/FINDINGS.md docs/dashboard.html
           if git diff --staged --quiet; then
             echo "nothing changed; not committing"
           else

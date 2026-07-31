@@ -66,9 +66,10 @@ def fixture_snapshot(tmp_path, monkeypatch):
 
 @pytest.fixture
 def built_marts(fixture_snapshot):
-    """Staging + marts built from the fixture snapshot."""
-    from orpulse import transform
+    """Staging + SQL marts + statistical marts from the fixture snapshot."""
+    from orpulse import derive, transform
 
     staging = transform.build_staging([fixture_snapshot])
     transform.build_marts(staging)
+    derive.build_all(transform.load_marts())
     return transform.load_marts()
