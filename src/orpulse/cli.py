@@ -78,6 +78,8 @@ def cmd_dashboard(args) -> int:
     if not marts:
         print("no marts found; run `make build` first", file=sys.stderr)
         return 1
+    if args.fragment:
+        print(f"wrote {dashboard.write_fragment(marts)}")
     print(f"wrote {dashboard.write(marts)}")
     return 0
 
@@ -126,6 +128,12 @@ def main(argv: list[str] | None = None) -> int:
     p.set_defaults(func=cmd_report)
 
     p = sub.add_parser("dashboard", help="build the self-contained HTML dashboard")
+    p.add_argument(
+        "--fragment",
+        action="store_true",
+        help="also emit the body-only form, for a host that supplies its own "
+             "document skeleton",
+    )
     p.set_defaults(func=cmd_dashboard)
 
     p = sub.add_parser("snapshots", help="list completed snapshots")
