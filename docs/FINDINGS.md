@@ -27,13 +27,13 @@ with identical token volume can be doing entirely different jobs.
 | **extractive** | 27 | 1.94 T | 0.8% | 34.2 | 8,924 | context-heavy but small interactions: classification, extraction, routing |
 | **output_heavy** | 70 | 138.05 B | 0.1% | 0.6 | 4,345 | emits one token per two consumed; in practice almost entirely image-output models |
 
-**The result worth stating plainly:** models classified as *agentic* account for
-**69.6% of all tokens** on OpenRouter while being only
-62 of 497 model-variants. Conversational traffic —
-what most people picture when they think "LLM API" — is 28.6%.
+Models classified as *agentic* account for **69.6% of all tokens**
+while being 62 of 497 model-variants. Conversational
+traffic, which is what most people picture when they think "LLM API", is
+28.6%.
 
-The gap between the count and the share is the whole point. Agentic workloads
-are rare per model and enormous per request.
+The gap between the count and the share is what the fingerprint is for. Agentic
+workloads are rare per model and enormous per request.
 
 
 ## 2. The extremes of the context axis
@@ -54,20 +54,19 @@ Ranked by tokens of context consumed per token produced, among models above
 | `qwen/qwen3-coder-480b-a35b-07-25` | 81.0 | 20,956 | 103.83 B | agentic |
 | `anthropic/claude-4.7-opus-20260416` | 80.7 | 64,223 | 7.17 T | agentic |
 
-**Why one axis is not enough.** The top of this ranking is
-`meta-llama/llama-guard-4-12b` at 195.3 tokens of context per token
-written — but its interactions average only 726
-tokens. A high P:C ratio on its own cannot tell a coding agent from a safety
-classifier: both read far more than they write. What separates them is the
-second axis. Reading a lot per call and reading a lot *per token produced* are
-different properties, and only their conjunction identifies agentic use.
+**Why both axes.** The top of this ranking is `meta-llama/llama-guard-4-12b` at
+195.3 tokens of context per token written, but its interactions
+average only 726 tokens. A high P:C ratio alone
+cannot tell a coding agent from a safety classifier; both read far more than they
+write. Reading a lot per call and reading a lot per token produced are different
+properties, and only their conjunction identifies agentic use.
 
 
 Contrast `nvidia/nemotron-3-ultra-550b-a55b-20260604`: 162.7 tokens of context per token
-written, but in interactions averaging 103,590 tokens —
-143× larger. That
-is not a classifier answering a short question. That is a model sitting inside a
-loop, re-reading a large accumulated state on every turn.
+written, in interactions averaging 103,590 tokens, which
+is 143× larger.
+That shape belongs to a model sitting inside a loop, re-reading a large
+accumulated state every turn, not to a classifier answering a short question.
 
 
 ## 3. Momentum, and why the age correction is not optional
@@ -81,9 +80,8 @@ effective_days = min(30, days since the model launched)
 momentum       = tokens in the last day / (tokens in the last 30 days / effective_days)
 ```
 
-Dividing by 30 for a model that has existed for four days inflates every recent
-launch by pure arithmetic — the analysis would then "discover" that new models
-grow, which is a tautology wearing a result's clothes.
+Dividing by 30 for a model four days old inflates every recent launch by
+arithmetic alone, and the analysis then "discovers" that new models grow.
 
 
 Across 207 ratable model-variants (at least
@@ -95,8 +93,8 @@ collapsing nor exploding in aggregate.
 
 
 For the 19 model-variants younger than 30 days, the uncorrected
-formula inflates momentum by a median factor of **1.36×**. That is the
-size of the artefact the correction removes.
+formula inflates momentum by a median **1.36×**. That is the size of the
+artefact the correction removes.
 
 
 **Accelerating** — highest momentum among ratable models:
@@ -131,9 +129,9 @@ Multiplying each model's tokens by its list price gives the gross value its
 traffic represents: **$167.3 M per month** across
 351 priced model-variants.
 
-This is *not* revenue. It ignores prompt-cache discounts, batch pricing, BYOK
-traffic, negotiated rates and OpenRouter's own margin, so it is an upper bound —
-which is why the column is called `implied_gross_value` and never `revenue`.
+This is an upper bound, not revenue: it ignores prompt-cache discounts, batch
+pricing, BYOK traffic, negotiated rates and OpenRouter's own margin. The column
+is called `implied_gross_value` and never `revenue` for that reason.
 
 | Lab | Share of tokens | Share of implied value | Value per token of attention |
 |---|---|---|---|
@@ -146,10 +144,10 @@ which is why the column is called `implied_gross_value` and never `revenue`.
 | `xiaomi` | 15.2% | 3.5% | 0.23x |
 | `tencent` | 12.2% | 2.3% | 0.19x |
 
-Concentration makes the same point without picking a winner. Measured by tokens,
+Concentration makes the same point without naming a winner. Measured by tokens,
 the labs sit at an HHI of **1,061**. Measured by money they sit at
-**2,501** — past the 2,500 mark competition authorities treat as
-highly concentrated — and the largest lab takes **44.9%** of
+**2,501**, past the 2,500 mark competition authorities treat as
+highly concentrated, and the largest lab takes **44.9%** of
 the value against 17.2% of the tokens.
 
 The Gini coefficient across models is **0.935** by tokens
@@ -161,10 +159,10 @@ national income distribution above 0.6 is considered severe.
 
 Traffic is overwhelmingly prompt-heavy, and prompt tokens cost less than
 completions. Blended across each model's real token mix, the price actually paid
-per token is a median of **0.32x** the headline output price — the
-sticker overstates the true unit cost by about **3.1x**.
+per token is a median **0.32x** the headline output price, so the
+sticker overstates unit cost by about **3.1x**.
 
-This is the number a buyer comparing models on `$/M output` is getting wrong.
+Anyone comparing models on `$/M output` is getting this wrong.
 
 
 ## 5. The context window arms race is mostly unused
@@ -180,10 +178,12 @@ of the window the traffic actually touches. Token-weighted across the market:
 | **output_heavy** | 1.87% |
 | **extractive** | 1.68% |
 
-Even agentic traffic — the workload that exists *because* of long context — uses
-under a tenth of what it is sold. One caveat, and it cuts one way: tokens per
-request is a mean, so a model that occasionally fills a million-token window and
-usually does not still reads low. This bounds typical usage, not peak capability.
+The pattern holds even where it should not: models bought for their long context
+still leave nine tenths of it idle.
+
+Tokens per request is a mean, so a model that fills a million-token window
+occasionally and stays small usually will read low here. The number bounds
+typical usage; peak capability is a separate question this cannot answer.
 
 
 ## 6. The serving layer: Pareto-dominated endpoints
@@ -214,23 +214,23 @@ evidence.
 
 ## 7. Is the classification stable?
 
-Fixed thresholds only beat clustering if the resulting labels hold still. That
-is measurable rather than assumable, so it is measured: the share of models that
-change archetype between consecutive captures.
+Fixed thresholds only beat clustering if the labels hold still, which is
+measurable, so it is measured: the share of models changing archetype between
+consecutive captures.
 
 
-> Not yet measurable — it needs two completed snapshots. This is the first.
+> Not yet measurable: it needs two completed snapshots and this is the first.
 > The metric is built and will populate on the next capture.
 
 
 ## 8. Price response, and where it hides
 
 Regressing log tokens on log price with heteroskedasticity-robust (HC1) standard
-errors — robust rather than classical because token volume spans nine orders of
-magnitude and classical errors would claim confidence the data cannot support.
+errors. Token volume spans nine orders of magnitude, so classical errors would
+claim confidence the data cannot support.
 
-Two weightings, because they answer different questions. Unweighted treats every
-model as one observation. Request-weighted follows where the traffic actually is.
+Two weightings, because they answer different questions. One model, one vote;
+or one request, one vote.
 
 | Segment | Weighting | Elasticity | 95% CI | R² | n | Clears zero |
 |---|---|---|---|---|---|---|
@@ -245,31 +245,30 @@ model as one observation. Request-weighted follows where the traffic actually is
 | **extractive** | unweighted | -0.04 | -0.52 to +0.44 | 0.001 | 20 | no |
 | **output_heavy** | unweighted | -0.67 | -1.19 to -0.14 | 0.047 | 36 | yes |
 
-**The result worth the space is the reversal in agentic traffic.** Counting
+**The reversal in agentic traffic is the result worth the space.** Counting
 models equally, price explains nothing (-0.08, interval
 -0.62 to +0.47, straddling zero). Weighting by requests, the
 elasticity is **-0.47** (-0.67 to -0.26) and
 clears zero comfortably.
 
-Agentic *models* are not price-sensitive. Agentic *volume* is. That is the
-signature of a small number of very large consumers optimising unit cost hard,
-and it is invisible to any analysis that treats each model as one data point.
+Agentic *models* are not price-sensitive. Agentic *volume* is. That is what a
+small number of very large consumers optimising unit cost looks like, and it is
+invisible to any analysis treating each model as one data point.
 
-**This is not a causal elasticity.** It is a cross-section of different models at
-different prices, not one model observed at several prices, so it absorbs
-everything that makes cheap models cheap — smaller, weaker, newer. A steep slope
-is as consistent with "buyers chase cheap tokens" as with "cheap models are the
-ones built for bulk work". The comparison *between* archetypes carries more than
-any single coefficient.
+**Read this as association, not cause.** Nothing here observes one model at two
+prices; it compares models that differ in price and in everything else, quality
+included. Either story fits a steep slope: buyers hunting cheap tokens, or cheap
+models being the ones built for bulk work. What survives that ambiguity is the
+*contrast* between archetypes, which is why the table reports segments rather
+than one number.
 
 
 ## 9. How long does a model live? (preliminary)
 
 Kaplan-Meier with right-censoring. Most models are still running, so their
-lifetime is known only to be *at least* their current age: dropping them would
-bias the curve towards short lives, counting their age as a lifetime would bias
-it the other way, and the product-limit estimator uses exactly what each subject
-carries. The implementation reproduces the published curve for the Freireich
+lifetime is known only to be *at least* their current age. Dropping them biases
+the curve towards short lives; counting their age as a lifetime biases it the
+other way. The implementation reproduces the published curve for the Freireich
 leukemia trial, which is what `tests/test_analytics.py` asserts.
 
 | Death defined as | Events | Censored | Alive at 180d | Alive at 365d |
@@ -279,24 +278,22 @@ leukemia trial, which is what `tests/test_analytics.py` asserts.
 | ≥7 days silent | 11 | 342 | 98.8% | 96.6% |
 | ≥14 days silent | 1 | 352 | 100.0% | 99.2% |
 
-**Why this is labelled preliminary.** Death is inferred from the last day with
-traffic, and two biases pull against each other. A model silent for more than
-about 30 days leaves the monthly window entirely, so long-dead models are absent
-and survival is biased *up* — the giveaway is in the table, where a 14-day
-threshold finds almost no events at all, which is a property of the feed rather
-than of the market. Meanwhile a 2-day threshold books a model that merely had a
-quiet Tuesday as dead, biasing *down*. Their relative magnitudes are unknown.
+**Why this is preliminary.** Death is inferred from the last day with traffic,
+and two biases pull against each other. A model silent for more than about 30
+days leaves the monthly window entirely, so long-dead models are absent and
+survival is biased *up*. The tell is in the table: a 14-day threshold finds
+almost no events, which is a property of the feed rather than the market.
+Meanwhile a 2-day threshold books a model that had a quiet Tuesday as dead,
+biasing *down*. Their relative magnitudes are unknown.
 
-What fixes it costs nothing but time. Once the archive holds several weeks of
-captures, death is *observed* — present on day N, absent on day N+k — instead of
-inferred from a truncated field. The estimator does not change; its input stops
-being biased. This is the clearest case in the project of a metric that only a
-growing archive can make real.
+The fix costs only time. Once the archive holds several weeks of captures, death
+is *observed*, present on day N and absent on day N+k, instead of inferred from a
+truncated field. The estimator does not change; its input stops being biased.
 
 
 ## 10. What this cannot tell you
 
-Stating the limits is part of the result.
+The limits are part of the result.
 
 - **No daily history exists publicly.** The rankings feed returns trailing
   aggregates, and its `date` field is the model's last day with traffic, not a
@@ -321,6 +318,6 @@ Stating the limits is part of the result.
 Sources and methodology in [METHODOLOGY.md](METHODOLOGY.md).*
 
 <!-- This file is a pure function of the marts: same data in, byte-identical
-     file out. No wall-clock timestamp, deliberately -- CI asserts that the
-     committed report matches what the committed data produces, and a clock
-     would make that check impossible. -->
+     file out. No wall-clock timestamp: CI asserts that the committed report
+     matches what the committed data produces, and a clock would break that
+     check. -->

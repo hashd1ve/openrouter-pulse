@@ -1,11 +1,8 @@
-"""HTTP access to OpenRouter's public endpoints.
+"""HTTP access to OpenRouter's public endpoints, all unauthenticated.
 
-Everything here is unauthenticated. Two families of endpoint are used:
-
-* ``/api/v1/*``      -- documented and stable.
-* ``/api/frontend/*`` -- undocumented; it is what openrouter.ai/rankings calls.
-  It can change shape without notice, which is why ``tests/test_contract.py``
-  exists as a separate, non-blocking alarm.
+``/api/v1/*`` is documented and stable. ``/api/frontend/*`` backs
+openrouter.ai/rankings, has no contract, and can change shape without notice;
+``tests/test_contract.py`` watches it from a separate workflow.
 """
 
 from __future__ import annotations

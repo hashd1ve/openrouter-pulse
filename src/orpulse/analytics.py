@@ -1,12 +1,10 @@
-"""Statistical estimators.
+"""Statistical estimators for the marts.
 
-SQL models sets; it does not do survival analysis or robust regression. These
-are the estimators the marts need, implemented directly rather than pulled in
-from lifelines/statsmodels: they are short, the assumptions matter more than the
-code, and every one is verified in `tests/test_analytics.py` against a case with
-a known closed-form answer.
+Implemented directly instead of pulling in lifelines/statsmodels: they are short,
+the assumptions matter more than the code, and each is verified in
+`tests/test_analytics.py` against a case with a known answer.
 
-Everything here is pure: arrays in, arrays out, no I/O.
+Pure functions throughout: arrays in, arrays out, no I/O.
 """
 
 from __future__ import annotations

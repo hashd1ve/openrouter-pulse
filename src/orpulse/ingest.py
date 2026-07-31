@@ -135,7 +135,7 @@ def run(
     manifest.duration_seconds = round(time.monotonic() - started, 2)
     manifest.complete = True
 
-    # Written last, on purpose: this is the commit point of the snapshot.
+    # Written last. This is the snapshot's commit point.
     (out / MANIFEST_NAME).write_text(json.dumps(asdict(manifest), indent=2))
     log.info(
         "snapshot %s complete: %d ok, %d failed, %.1f MB in %.0fs",
@@ -149,7 +149,7 @@ def run(
 
 
 def list_snapshots() -> list[str]:
-    """Dates of snapshots that completed. Incomplete ones are invisible on purpose."""
+    """Dates of completed snapshots. Incomplete ones stay invisible."""
     if not config.RAW_DIR.exists():
         return []
     dates = []

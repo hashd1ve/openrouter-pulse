@@ -1,9 +1,9 @@
 """Statistical marts: the ones SQL is the wrong tool for.
 
-`sql/marts.sql` handles everything set-based. This module handles estimators —
-survival with censoring, robust regression, concentration indices — and writes
-their output back out as Parquet alongside the rest, so consumers cannot tell
-which marts came from which engine.
+`sql/marts.sql` handles the set-based work. This handles estimators (survival
+with censoring, robust regression, concentration indices) and writes them out as
+Parquet beside the rest, so consumers cannot tell which engine produced which
+table.
 """
 
 from __future__ import annotations
@@ -43,9 +43,9 @@ def _concentration(values: pd.Series) -> dict:
 def market_structure(marts: dict[str, pd.DataFrame]) -> pd.DataFrame:
     """How concentrated the market is, by attention and by money.
 
-    Computed over two different measures on purpose. Token share says who the
-    machines talk to; value share says who gets paid. They disagree sharply,
-    and any single concentration number would hide that.
+    Two measures, because they disagree sharply: token share says who the
+    machines talk to, value share says who gets paid. A single number hides
+    that.
     """
     fp = marts["mart_model_fingerprint"]
     econ = marts.get("mart_model_economics", pd.DataFrame())
@@ -106,28 +106,13 @@ def _survival_frame(fp: pd.DataFrame, threshold: int) -> pd.DataFrame:
 def survival_marts(marts: dict[str, pd.DataFrame]) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Kaplan-Meier curve for model lifetime, plus a threshold sensitivity table.
 
-    ⚠ PRELIMINARY, and the reason is worth stating precisely.
+    PRELIMINARY. Death is inferred from `source_last_activity_date`, and two
+    biases pull against each other: right truncation (models silent >30 days
+    leave the window entirely, biasing survival up) and resurrection (a 2-day
+    threshold books a quiet Tuesday as death, biasing it down). Their relative
+    sizes are unknown, so the sensitivity table ships alongside the curve.
 
-    Death is inferred from `source_last_activity_date`, which creates two
-    biases pulling in opposite directions:
-
-    1. **Right truncation.** A model silent for more than about 30 days leaves
-       the monthly window entirely, so long-dead models are not in the data at
-       all. Every subject is conditioned on recent presence, which biases
-       survival UPWARD. The giveaway is in the sensitivity table: at a 30-day
-       threshold there are zero events, which is a property of the feed rather
-       than of the market.
-    2. **Resurrection.** At a 2-day threshold, a model that merely had a quiet
-       Tuesday is recorded as dead, which biases survival DOWNWARD.
-
-    Their relative magnitudes are unknown, so the curve is published as an
-    illustration of the method rather than as a finding.
-
-    What fixes it: once the archive holds several weeks of captures, death is
-    *observed* -- a model present on day N and absent on day N+k -- instead of
-    inferred from a truncated field. The estimator does not change; the input
-    stops being biased. This is the clearest case in the project of a metric
-    that only a growing archive can make real.
+    METHODOLOGY §11 has the full argument and the fix.
     """
     fp = marts["mart_model_fingerprint"]
     latest = fp[fp["snapshot_date"] == fp["snapshot_date"].max()]
@@ -170,15 +155,9 @@ def survival_marts(marts: dict[str, pd.DataFrame]) -> tuple[pd.DataFrame, pd.Dat
 def price_elasticity(marts: dict[str, pd.DataFrame]) -> pd.DataFrame:
     """Association between price and volume, by archetype.
 
-    NOT a causal elasticity. This is a cross-section of different models at
-    different prices, not one model observed at several prices, so the estimate
-    absorbs everything that makes cheap models cheap -- smaller, weaker, newer.
-    A steep slope is as consistent with "buyers chase cheap tokens" as with
-    "cheap models are the ones built for bulk work".
-
-    It is reported because the magnitude still bounds the story, and because
-    the differences BETWEEN archetypes are more informative than any single
-    coefficient: agentic buyers and chat buyers do not respond alike.
+    Association, not cause: no model is observed at two prices, so quality is
+    confounded with price. Reported because the magnitude bounds the story and
+    because archetypes differ from each other. METHODOLOGY §10.
     """
     econ = marts.get("mart_model_economics", pd.DataFrame())
     if econ.empty:

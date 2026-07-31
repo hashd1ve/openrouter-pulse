@@ -1,10 +1,9 @@
 -- =====================================================================
 -- Dimensional model over OpenRouter's public data.
 --
--- The one structural decision worth reading twice: the time key of every
--- fact is OUR capture date (`snapshot_date`), never the API's `date` field.
--- That field is the model's LAST DAY WITH TRAFFIC, not a series index.
--- Treating it as a time axis produces a convincing and entirely false chart.
+-- The time key of every fact is our capture date (`snapshot_date`), never the
+-- API's `date` field. That field holds the model's last day with traffic, not a
+-- series index; grouping by it produces a clean and false chart. METHODOLOGY §2.
 --
 -- Every CREATE TABLE below ends in an explicit ORDER BY. DuckDB guarantees no
 -- ordering otherwise, and unordered output makes the Parquet files -- and the

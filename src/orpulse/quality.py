@@ -1,13 +1,11 @@
 """Data quality checks that break the pipeline.
 
-A check that only logs is a check that gets ignored. Everything at ERROR
-severity aborts the build; WARN records a fact worth seeing but does not stop
-anything.
+ERROR severity aborts the build; WARN records something to look at. A check that
+only logs gets ignored.
 
-The most valuable check here is `nested_windows_consistent`. It is a *semantic*
-invariant rather than a structural one: `day <= week <= month` must hold because
-the windows are nested. It is exactly the check that would have caught, in an
-afternoon rather than a quarter, the misreading of this feed as a daily series.
+`nested_windows_consistent` is the one that earns its keep: `day <= week <=
+month` must hold because the windows are nested, so it catches a change in the
+feed's semantics rather than its schema. METHODOLOGY §2.
 """
 
 from __future__ import annotations

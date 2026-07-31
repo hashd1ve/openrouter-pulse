@@ -1,14 +1,12 @@
 """Inline SVG charts, no plotting library.
 
-Written by hand for one reason: the dashboard has to be a single file that
-renders anywhere with no server, no CDN and no runtime dependency. Every colour
-is a CSS custom property, so light and dark are one stylesheet apart and the
-palette lives in exactly one place.
+Hand-written so the dashboard stays a single file that renders anywhere without a
+server, a CDN or a runtime dependency. Colours are CSS custom properties, so the
+palette lives in one place and light/dark are one stylesheet apart.
 
-Palette slots are the validated categorical 1-3 plus a neutral for the folded
-tail. Scatter is an all-pairs form, which caps categorical hues at three -- so
-the two residual archetypes fold into the neutral rather than seating a fourth
-hue that would fail colourblind separation.
+Three categorical slots plus a neutral. Scatter puts every pair on screen at
+once, which caps colourblind-safe categorical hues at three, so the two residual
+archetypes fold into the neutral instead of seating a fourth.
 """
 
 from __future__ import annotations
@@ -98,8 +96,8 @@ def _nice_step(raw: float) -> float:
 
 def _frame(w, h, pad, x: Scale, y: Scale, x_title, y_title,
            x_fmt=fmt_compact, y_fmt=fmt_compact) -> str:
-    """Recessive grid, axis labels, titles. Everything at low opacity on purpose:
-    the data should be the only thing with contrast."""
+    """Grid, axis labels and titles, all at low opacity so the data keeps the
+    contrast."""
     parts = []
     for t in x.ticks():
         px = x.px(t)
@@ -226,11 +224,10 @@ def step_band(steps, *, x_title, y_title, label="", w=860, h=360,
 
     `y_floor` truncates the vertical axis. A curve that never drops below 88%
     plotted on a full 0-100% axis is a flat line against nine-tenths of empty
-    space, and the shape -- which is the whole point -- becomes invisible.
-    Truncating a bar chart's axis misrepresents magnitude and is never allowed;
-    truncating a step chart's axis rescales a trajectory and is fine SO LONG AS
-    it is stated, which is why the caller passes it explicitly and the caption
-    says so.
+    space, and the shape becomes invisible. Truncating a bar chart's axis
+    misrepresents magnitude and is never allowed; truncating a step chart's axis
+    rescales a trajectory and is fine if stated, so the caller passes it
+    explicitly and the caption reports it.
     """
     pad = (18, 24, 44, 62)
     if not steps:

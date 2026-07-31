@@ -1,12 +1,9 @@
 """Build a single self-contained HTML page from the marts.
 
-No server, no CDN, no runtime dependency: one file that opens anywhere. That is
-worth more than an interactive app for something meant to be sent as a link, and
-it means the page can be published as-is under a strict content policy.
-
-Light and dark are one stylesheet apart because every colour is a custom
-property. The dark steps are chosen for the dark surface, not flipped from the
-light ones.
+One file, no server and no CDN, so it opens anywhere and survives a strict
+content-security policy. Colours are custom properties, so light and dark are one
+stylesheet apart; the dark steps are chosen for the dark surface rather than
+flipped from the light ones.
 """
 
 from __future__ import annotations
@@ -203,10 +200,10 @@ def _hero(fp, econ, structure):
     return f"""
 <h1>What the LLM market is actually doing</h1>
 <p class="lede">Derived from OpenRouter's public data. Two ratios nobody
-publishes separate models that read enormous contexts to emit almost nothing
-from models that hold conversations. The first group is a tenth of the catalogue
-and most of the market — by volume and by value alike. Where attention and money
-<em>do</em> part company is one level up, between the labs.</p>
+publishes separate the models that read enormous contexts to emit almost nothing
+from the models that hold conversations. The first group is a tenth of the
+catalogue and most of the market, by volume and by value alike. Attention and
+money part company one level up, between the labs.</p>
 
 <div class="tiles">
   {_tile(f"{len(agentic)}<span class='muted' style='font-size:18px'> / {len(fp)}</span>", "agentic model-variants")}
@@ -214,8 +211,8 @@ and most of the market — by volume and by value alike. Where attention and mon
   {_tile("$" + fmt_compact(value), "implied gross value / month")}
   {_tile(f"{hhi_v:,.0f}<span class='muted' style='font-size:18px'> / {hhi_t:,.0f}</span>", "lab HHI: money / tokens")}
 </div>
-<p><small>The last tile is the headline of section 2: measured by money, the
-market is more than twice as concentrated as the token leaderboard suggests.</small></p>
+<p><small>Measured by money, the market is more than twice as concentrated as
+the token leaderboard suggests. Section 2 has the detail.</small></p>
 """
 
 
@@ -256,7 +253,7 @@ def _workload_plane(fp):
 tokens_per_request = total tokens / requests             → size of one interaction</pre>
 <p>Weighted by token volume, both axes are <strong>bimodal</strong>: modes at a
 P:C of 17 and 76, and at 10k and 62k tokens per request. The dashed cuts sit at
-the density minima between them, so they are measured rather than chosen.</p>
+the density minima between them, so they are measured, not chosen.</p>
 <figure>
   <div class="scroll">{charts.scatter_log_log(
       points, x_title="Prompt tokens per completion token (log)",
@@ -266,14 +263,13 @@ the density minima between them, so they are measured rather than chosen.</p>
   {_legend([("s1", "agentic"), ("s2", "conversational"), ("s3", "extractive"),
             (NEUTRAL, "other / unclassified")])}
   <figcaption>One dot per model-variant above 100k monthly requests; area is
-  token volume. Labelled: the largest of each group. Dashed lines are the
+  token volume. The largest of each group is labelled. Dashed lines are the
   classification cuts.</figcaption>
 </figure>
-<div class="callout"><p><strong>Why one axis is not enough.</strong> The highest
-P:C ratio in the whole dataset belongs to a safety classifier, not an agent — it
-reads 195 tokens per token written, but its interactions average 726 tokens. A
-context-hungry classifier and a coding agent look identical on that axis alone.
-Only the conjunction separates them.</p></div>
+<div class="callout"><p><strong>Why both axes.</strong> The highest P:C ratio in
+the dataset belongs to a safety classifier. It reads 195 tokens per token
+written, but its interactions average 726 tokens. On that axis alone a
+context-hungry classifier and a coding agent look identical.</p></div>
 {_table(tbl, [("archetype_", "Archetype"), ("models_", "Model-variants"),
               ("tokens_", "Tokens (30d)"), ("share_", "Share"),
               ("pc_", "Median P:C"), ("tpr_", "Median tok/req")],
@@ -326,16 +322,15 @@ def _economics(econ, structure):
     return f"""
 <h2>2 · Attention and money part company between the labs</h2>
 <p>Multiplying each model's tokens by its list price gives the gross value its
-traffic represents. It is <em>not</em> revenue — it ignores cache discounts,
-batch rates, BYOK and negotiated pricing — so it is an upper bound, and named
-<code>implied_gross_value</code> everywhere so nobody forgets.</p>
+traffic represents. This is an upper bound, not revenue: it ignores cache
+discounts, batch rates, BYOK and negotiated pricing. The column is called
+<code>implied_gross_value</code> everywhere for that reason.</p>
 <figure>
   <div class="scroll">{charts.paired_bars(
       rows, left_title="share of tokens", right_title="share of implied value",
       label="Token share against value share, by lab")}</div>
-  <figcaption>The nine labs with the largest share of implied value. Bars are
-  mirrored around the label so the gap between the two measures is the thing
-  you see first.</figcaption>
+  <figcaption>The nine labs with the largest share of implied value. Bars mirror
+  around the label so the gap between the two measures reads first.</figcaption>
 </figure>
 {_table(ct, [("k_", "Concentration of…"), ("hhi_", "HHI"), ("gini_", "Gini"),
              ("t1_", "Top 1"), ("t10_", "Top 10")],
@@ -355,7 +350,7 @@ overstates the true unit cost by about <strong>{1 / blended:.1f}×</strong>.</p>
 {_table(mv, [("m_", "Model"), ("t_", "Rank by tokens"), ("v_", "Rank by value"),
              ("ts_", "Token share"), ("vs_", "Value share")],
         numeric={"t_", "v_", "ts_", "vs_"})}
-<figcaption>The models whose standing collapses when ranked by money instead of
+<figcaption>Models whose standing collapses when ranked by money instead of
 volume: high-volume, near-free weights.</figcaption>
 """
 
@@ -386,11 +381,10 @@ per request by the advertised window asks how much of it the traffic touches.</p
   <figcaption>Median across models in each group. Token-weighted across the
   whole market: {weighted:.2%}.</figcaption>
 </figure>
-<p>Even agentic traffic — the workload that exists because of long context —
-uses under a tenth of what it is sold. The caveat is real and cuts one way:
-tokens per request is a <em>mean</em>, so a model that occasionally fills a
-million-token window and usually does not still reads low here. This bounds
-typical usage, not peak capability.</p>
+<p>The workloads bought for long context leave nine tenths of it idle. One
+caveat, cutting one way: tokens per request is a mean, so a model that fills a
+huge window occasionally and stays small usually reads low here. Typical usage,
+not peak capability.</p>
 """
 
 
@@ -426,26 +420,26 @@ def _competition(comp, scoreboard, pp):
   {_tile(f"{comp['jitter_index'].median():.1f}×", "median p99 / p50 latency")}
 </div>
 <p>Where more than one provider serves the same model, the median HHI is still
-above 5,000 — competition exists on paper more than in traffic. And the price of
-the identical model varies by up to an order of magnitude.</p>
+above 5,000: competition exists on paper more than in traffic. The price of an
+identical model varies by up to an order of magnitude.</p>
 {_table(st, [("m_", "Model"), ("n_", "Providers"), ("s_", "Price spread"),
              ("lo_", "Cheapest /M out"), ("hi_", "Dearest /M out")],
         numeric={"n_", "s_", "lo_", "hi_"})}
 <p>An endpoint is <em>dominated</em> when another serving the same model is both
-cheaper and faster at the median. The jitter index — p99 over p50 latency —
-measures consistency rather than speed: a provider can be quick on average and
+cheaper and faster at the median. The jitter index, p99 over p50 latency,
+measures consistency instead of speed: a provider can be quick on average and
 still miss deadlines.</p>
 {_table(pt, [("p_", "Provider"), ("m_", "Models"), ("thr_", "Median tok/s"),
              ("jit_", "Jitter"), ("pp_", "Price percentile")],
         numeric={"m_", "thr_", "jit_", "pp_"}) if not pt.empty else ""}
-<figcaption>Busiest providers by requests observed in the sampling window. Price
-percentile is their typical standing among everyone serving the same model:
+<figcaption>Busiest providers by requests seen in the sampling window. Price
+percentile is their typical standing among everyone serving the same model, where
 0% is cheapest.</figcaption>
-<div class="callout"><p><strong>Caveat that constrains all of section 4.</strong>
-These percentiles come from a 30-minute rolling window, so a daily capture
-samples half an hour, not the day. The dominance share is stable at 53–55% for
-any volume floor between 0 and 1,000 requests, which is reassuring — but a
-single capture indicates where to look, it does not settle anything.</p></div>
+<div class="callout"><p><strong>This constrains all of section 4.</strong> The
+percentiles come from a 30-minute rolling window, so a daily capture samples half
+an hour, not the day. The dominance share holds at 53–55% for any volume floor
+between 0 and 1,000 requests, which is reassuring, but one capture indicates
+where to look and settles nothing.</p></div>
 """
 
 
@@ -464,29 +458,27 @@ def _elasticity(el):
 
     return f"""
 <h2>5 · Price response, and where it hides</h2>
-<p>Regressing log tokens on log price, with heteroskedasticity-robust standard
-errors. Two weightings: unweighted treats every model as one observation;
-request-weighted follows where the traffic actually is.</p>
+<p>Log tokens on log price, with heteroskedasticity-robust standard errors, under
+two weightings: one model one vote, or one request one vote.</p>
 <figure>
   <div class="scroll">{charts.forest(
       rows, x_title="elasticity (Δ log tokens / Δ log price), 95% CI",
       label="Price elasticity by archetype and weighting")}</div>
   {_legend([("s1", "significant at 95%"), (NEUTRAL, "not distinguishable from zero")])}
-  <figcaption>Point estimate with its 95% interval. Coloured where the interval
+  <figcaption>Point estimate with its 95% interval, coloured where the interval
   excludes zero.</figcaption>
 </figure>
-{f'''<p>The interesting result is the reversal in agentic traffic. Counting
+{f'''<p>The result worth the space is the reversal in agentic traffic. Counting
 models equally, price explains nothing. Weighting by requests, the elasticity is
 <strong>{a.elasticity:+.2f}</strong> ({a.ci_low:+.2f} to {a.ci_high:+.2f}) and
 clears zero comfortably. Agentic <em>models</em> are not price-sensitive; agentic
-<em>volume</em> is. That is the signature of a small number of very large
-consumers optimising unit cost hard.</p>''' if a is not None else ""}
-<div class="callout"><p><strong>This is not a causal elasticity.</strong> It is a
-cross-section of different models at different prices, not one model observed at
-several prices, so it absorbs everything that makes cheap models cheap — smaller,
-weaker, newer. A steep slope is as consistent with "buyers chase cheap tokens" as
-with "cheap models are the ones built for bulk work". The comparison
-<em>between</em> archetypes carries more than any single coefficient.</p></div>
+<em>volume</em> is, which is what a small number of very large consumers
+optimising unit cost looks like.</p>''' if a is not None else ""}
+<div class="callout"><p><strong>Association, not cause.</strong> No model is
+observed at two prices here. Cheap models differ from dear ones in quality as
+well as price, so a steep slope fits "buyers hunt cheap tokens" and "cheap models
+are built for bulk work" equally well. The contrast <em>between</em> archetypes
+survives that ambiguity; a single coefficient does not.</p></div>
 """
 
 
@@ -514,10 +506,9 @@ def _survival(curve, sens):
     return f"""
 <h2>6 · How long does a model live? (preliminary)</h2>
 <p>Kaplan-Meier with right-censoring. Most models are still running, so their
-lifetime is only known to be <em>at least</em> their current age — dropping them
-would bias the curve towards short lives, and counting their age as a lifetime
-would bias it the other way. The product-limit estimator uses exactly what each
-subject carries.</p>
+lifetime is known only to be <em>at least</em> their current age. Dropping them
+biases the curve towards short lives; counting their age as a lifetime biases it
+the other way. The product-limit estimator uses what each subject carries.</p>
 <figure>
   <div class="scroll">{charts.step_band(
       steps, x_title="days since the model launched", y_title="still active",
@@ -532,19 +523,18 @@ subject carries.</p>
 {_table(s, [("th_", "Death defined as"), ("ev_", "Events"), ("ce_", "Censored"),
             ("s180_", "Alive at 180d"), ("s365_", "Alive at 365d")],
         numeric={"ev_", "ce_", "s180_", "s365_"})}
-<div class="callout"><p><strong>Why this is labelled preliminary.</strong> Death
-is inferred from the last day with traffic, and two biases pull against each
-other. A model silent for more than about 30 days leaves the monthly window
-entirely, so long-dead models are absent and survival is biased <em>up</em> —
-the giveaway is in the table above, where a 14-day threshold finds almost no
-events at all, which is a property of the feed and not of the market. Meanwhile a
-2-day threshold books a model that merely had a quiet Tuesday as dead, biasing
-<em>down</em>. Their relative sizes are unknown.</p>
-<p>What fixes it costs nothing but time: once the archive holds several weeks of
-captures, death is <em>observed</em> — present on day N, absent on day N+k —
-rather than inferred from a truncated field. The estimator does not change; its
-input stops being biased. This is the clearest case in the project of a metric
-that only a growing archive can make real.</p></div>
+<div class="callout"><p><strong>Why this is preliminary.</strong> Death is
+inferred from the last day with traffic, and two biases pull against each other.
+A model silent for more than about 30 days leaves the monthly window entirely, so
+long-dead models are absent and survival is biased <em>up</em>. The tell is in
+the table above: a 14-day threshold finds almost no events, which is a property
+of the feed and not of the market. Meanwhile a 2-day threshold books a model that
+had a quiet Tuesday as dead, biasing <em>down</em>. Their relative sizes are
+unknown.</p>
+<p>The fix costs only time. Once the archive holds several weeks of captures,
+death is <em>observed</em>, present on day N and absent on day N+k, instead of
+inferred from a truncated field. The estimator does not change; its input stops
+being biased.</p></div>
 """
 
 
@@ -562,10 +552,9 @@ def _variants(var):
   {_tile(f"{free['free_to_paid_intensity'].median():.2f}×", "free vs paid interaction size")}
 </div>
 <p>For models shipping both tiers, the free variant carries a median
-{_pct(free['free_token_share'].median(), 0)} of the tokens — and its
-interactions are <em>larger</em> than the paid tier's, not smaller. A funnel
-would look the opposite: small free trials graduating into heavy paid usage.
-This looks like substitution.</p>
+{_pct(free['free_token_share'].median(), 0)} of the tokens, and its interactions
+run <em>larger</em> than the paid tier's. A funnel would look the opposite: small
+free trials graduating into heavy paid usage. This looks like substitution.</p>
 """
 
 
@@ -607,7 +596,7 @@ def _health(marts):
 def _limits():
     return """
 <h2>What this cannot tell you</h2>
-<p>Stating the limits is part of the result.</p>
+<p>The limits are part of the result.</p>
 <ul>
 <li><strong>No public history exists.</strong> The rankings feed returns trailing
 aggregates, and its <code>date</code> column is the model's last day with
@@ -620,8 +609,8 @@ aggregate.</li>
 <li><strong>Four schema fields are dormant</strong> — cache, reasoning and
 tool-call counters are present but zero for every model. Nothing is built on
 them; a contract test watches for them waking up.</li>
-<li><strong>Traffic is not users.</strong> One agentic application can outproduce
-a million chat sessions. Nothing here measures adoption or satisfaction.</li>
+<li><strong>Traffic is not users.</strong> One agentic application can outproduce a
+million chat sessions. Nothing here measures adoption or satisfaction.</li>
 <li><strong>Archetype cuts are frozen, not re-fitted.</strong> Boundary models
 will flip between captures; that is measured rather than assumed away.</li>
 </ul>
@@ -663,9 +652,9 @@ def content(marts: dict[str, pd.DataFrame]) -> str:
         _variants(latest("mart_variant_economics")),
         _health(marts),
         _limits(),
-        f"""<hr><p><small>Snapshot <code>{esc(snapshot)}</code>. Every figure on
-this page is read from <code>data/marts/</code> — none is typed by hand, and the
-page is regenerated from the data on every build. Method and derivations in
+        f"""<hr><p><small>Snapshot <code>{esc(snapshot)}</code>. Every figure on this
+page is read from <code>data/marts/</code>; none is typed by hand, and the page
+is regenerated from the data on every build. Method and derivations in
 METHODOLOGY.md.<br>Built against OpenRouter's public API by an independent
 analyst. Not affiliated with OpenRouter.</small></p>""",
     ])

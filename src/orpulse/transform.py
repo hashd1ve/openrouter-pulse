@@ -146,9 +146,9 @@ def stage_endpoint_perf(snapshot_date: str) -> pd.DataFrame:
                     "p90_latency": stats.get("p90_latency"),
                     "p99_latency": stats.get("p99_latency"),
                     "stat_request_count": stats.get("request_count"),
-                    # Carried with the data on purpose: these percentiles cover a
-                    # 30-minute rolling window, not the day. Averaging snapshots
-                    # without weighting by request_count would be wrong.
+                    # Travels with the data: these percentiles cover a 30-minute
+                    # rolling window, not the day, so averaging across snapshots
+                    # needs weighting by request_count.
                     "window_minutes": stats.get("window_minutes"),
                 }
             )
