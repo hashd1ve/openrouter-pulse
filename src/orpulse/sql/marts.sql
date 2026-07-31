@@ -296,7 +296,13 @@ SELECT
     END AS archetype,
     month_tokens::DOUBLE / nullif(sum(month_tokens) OVER (PARTITION BY snapshot_date), 0)
         AS token_share,
-    row_number() OVER (PARTITION BY snapshot_date ORDER BY month_tokens DESC) AS token_rank,
+    -- Tiebreakers are load-bearing: 28 model-variants share a token count
+    -- (mostly zeros), and row_number() would hand them arbitrary ranks that
+    -- change between identical runs.
+    row_number() OVER (
+        PARTITION BY snapshot_date
+        ORDER BY month_tokens DESC, model_permaslug, variant
+    ) AS token_rank,
     source_last_activity_date
 FROM scored
 ORDER BY snapshot_date, model_permaslug, variant;
