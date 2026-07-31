@@ -117,9 +117,15 @@ def test_params_are_encoded_into_the_url():
     assert "variant=standard" in client.session.calls[0]
 
 
-def test_user_agent_is_identifiable():
-    client = make_client([])
-    assert "contact" in client.session.headers["User-Agent"]
+def test_user_agent_is_identifiable_and_reachable():
+    """Undocumented endpoints get scraped politely and traceably or not at all.
+
+    A URL rather than an email: it reaches the issue tracker without stamping a
+    personal address into somebody else's access logs on every request.
+    """
+    ua = make_client([]).session.headers["User-Agent"]
+    assert ua.startswith("orpulse/")
+    assert "https://" in ua, "the UA must carry a way to reach whoever is asking"
 
 
 def test_gzip_roundtrip(tmp_path):

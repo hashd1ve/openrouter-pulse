@@ -8,10 +8,13 @@ from pathlib import Path
 BASE_URL = "https://openrouter.ai"
 
 # Identifiable, contactable User-Agent. These frontend endpoints are undocumented;
-# scraping them anonymously and aggressively is both rude and indefensible.
+# scraping them anonymously and aggressively is both rude and indefensible. The
+# project URL is the contact point: it reaches the issue tracker without putting
+# a personal address in every request log.
 USER_AGENT = os.environ.get(
     "ORPULSE_USER_AGENT",
-    "orpulse/0.1 (public-data research project; contact: https://github.com/hashd1ve/openrouter-pulse)",
+    "orpulse/0.1 (+https://github.com/hashd1ve/openrouter-pulse; "
+    "public-data research; one capture per day)",
 )
 
 # Conservative pacing. A full endpoint sweep is ~365 requests; at 4/s that is
