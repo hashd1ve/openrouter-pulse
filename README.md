@@ -61,8 +61,11 @@ make contract   # verify the upstream API still matches expectations
 ```
 
 No API key, no database, no secrets, no plotting library. `git clone && make
-build` reproduces every published figure from the committed snapshots, byte for
-byte.
+build` reproduces every published figure from the committed snapshots — the
+marts and `FINDINGS.md` byte for byte, which is what CI asserts. The dashboard
+is deliberately excluded from that check: its vitals panel reports how stale the
+data is *right now*, and a page that reports the current time cannot be
+byte-stable without lying about it.
 
 ---
 

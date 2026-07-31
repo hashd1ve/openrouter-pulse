@@ -31,6 +31,11 @@ jobs:
           python -m orpulse.cli build
           python -m orpulse.cli report
           python -m orpulse.cli dashboard
-          git diff --exit-code docs/FINDINGS.md docs/dashboard.html \
-            || (echo "::error::generated docs are stale; run 'make report dashboard' and commit" \
-                && exit 1)
+          # Only FINDINGS.md is asserted byte-for-byte. It is a pure function of
+          # the marts. The dashboard is not, and deliberately so: its vitals
+          # panel reports how old the data is *right now*, which is a live
+          # property and the whole point of having the panel. Asserting
+          # byte-equality on a page that reports the current time would be the
+          # wrong assertion, so the dashboard is only checked for being buildable.
+          git diff --exit-code docs/FINDINGS.md \
+            || (echo "::error::FINDINGS.md is stale; run 'make report' and commit" && exit 1)
