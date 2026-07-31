@@ -5,6 +5,10 @@
 -- fact is OUR capture date (`snapshot_date`), never the API's `date` field.
 -- That field is the model's LAST DAY WITH TRAFFIC, not a series index.
 -- Treating it as a time axis produces a convincing and entirely false chart.
+--
+-- Every CREATE TABLE below ends in an explicit ORDER BY. DuckDB guarantees no
+-- ordering otherwise, and unordered output makes the Parquet files -- and the
+-- report generated from them -- differ from themselves between identical runs.
 -- =====================================================================
 
 
@@ -70,7 +74,8 @@ SELECT
     *,
     lead(valid_from) OVER (PARTITION BY model_permaslug ORDER BY version_num) AS valid_to,
     lead(valid_from) OVER (PARTITION BY model_permaslug ORDER BY version_num) IS NULL AS is_current
-FROM collapsed;
+FROM collapsed
+ORDER BY model_permaslug, version_num;
 
 
 -- ---------------------------------------------------------------------
@@ -117,7 +122,8 @@ SELECT
     max(snapshot_date)                            AS last_seen
 FROM stg_endpoint_perf
 WHERE endpoint_id IS NOT NULL
-GROUP BY endpoint_id;
+GROUP BY endpoint_id
+ORDER BY endpoint_id;
 
 CREATE OR REPLACE TABLE fct_endpoint_perf_snapshot AS
 SELECT
@@ -292,7 +298,8 @@ SELECT
         AS token_share,
     row_number() OVER (PARTITION BY snapshot_date ORDER BY month_tokens DESC) AS token_rank,
     source_last_activity_date
-FROM scored;
+FROM scored
+ORDER BY snapshot_date, model_permaslug, variant;
 
 
 -- ---------------------------------------------------------------------
@@ -324,7 +331,8 @@ SELECT
         / nullif(count(*), 0)                                  AS reassignment_rate
 FROM seq
 WHERE prev_archetype IS NOT NULL
-GROUP BY snapshot_date, prev_snapshot_date;
+GROUP BY snapshot_date, prev_snapshot_date
+ORDER BY snapshot_date;
 
 
 -- ---------------------------------------------------------------------
