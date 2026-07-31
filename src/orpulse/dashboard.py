@@ -36,6 +36,9 @@ STYLE = """
   --surface:#fcfcfb; --surface-2:#f4f4f1; --border:#e2e1dc;
   --text:#0b0b0b; --muted:#52514e;
   --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --neutral:#8a8a85;
+  /* Status is a separate scale from the categorical one: reusing a series
+     hue for "healthy" would make a chart legend read as a state. */
+  --ok:#1f7a4d; --warn:#a86a00; --bad:#b3261e;
 }
 @media (prefers-color-scheme:dark){
   :root:where(:not([data-theme="light"])){
@@ -43,6 +46,7 @@ STYLE = """
     --surface:#1a1a19; --surface-2:#232322; --border:#33332f;
     --text:#ffffff; --muted:#c3c2b7;
     --s1:#3987e5; --s2:#d95926; --s3:#199e70; --neutral:#77776f;
+    --ok:#3da06a; --warn:#c98f2a; --bad:#e06b62;
   }
 }
 :root[data-theme="dark"]{
@@ -50,6 +54,7 @@ STYLE = """
   --surface:#1a1a19; --surface-2:#232322; --border:#33332f;
   --text:#ffffff; --muted:#c3c2b7;
   --s1:#3987e5; --s2:#d95926; --s3:#199e70; --neutral:#77776f;
+  --ok:#3da06a; --warn:#c98f2a; --bad:#e06b62;
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--surface);color:var(--text);
@@ -117,11 +122,25 @@ summary:hover{color:var(--text)}
 .callout{border-left:3px solid var(--s2);background:var(--surface-2);
   border-radius:0 10px 10px 0;padding:14px 18px;margin:20px 0}
 .callout p:last-child{margin-bottom:0}
-.checks{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+.checks{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
   gap:10px;margin:18px 0}
+/* State is encoded in the stripe, the pill text and the colour together, never
+   in colour alone -- and never in an emoji, which screen readers announce as
+   whatever their vendor decided it means. */
 .check{background:var(--surface-2);border:1px solid var(--border);
-  border-radius:10px;padding:10px 13px;font-size:13px}
-.check b{display:block;font-weight:580;margin-bottom:2px}
+  border-left:3px solid var(--ok);border-radius:0 10px 10px 0;
+  padding:11px 14px;font-size:13px}
+.check.warn{border-left-color:var(--warn)}
+.check.bad{border-left-color:var(--bad)}
+.check b{display:block;font-weight:580;margin-bottom:3px;
+  font-variant-numeric:tabular-nums}
+.pill{display:inline-block;font-size:10.5px;font-weight:640;letter-spacing:.07em;
+  text-transform:uppercase;padding:1px 6px;border-radius:4px;margin-right:7px;
+  vertical-align:1px;color:var(--surface);background:var(--ok)}
+.pill.warn{background:var(--warn)}
+.pill.bad{background:var(--bad)}
+:focus-visible{outline:2px solid var(--s1);outline-offset:3px;border-radius:3px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 """
 
 
@@ -552,11 +571,18 @@ This looks like substitution.</p>
 
 def _health(marts):
     results = quality.run_all(marts)
-    cards = "".join(
-        f'<div class="check"><b>{"✅" if r.passed else ("❌" if r.severity == quality.ERROR else "⚠️")} '
-        f'{esc(r.name)}</b><span class="muted">{esc(r.detail)}</span></div>'
-        for r in results
-    )
+    def card(r):
+        if r.passed:
+            cls, word = "", "pass"
+        elif r.severity == quality.ERROR:
+            cls, word = "bad", "fail"
+        else:
+            cls, word = "warn", "warn"
+        return (f'<div class="check {cls}">'
+                f'<b><span class="pill {cls}">{word}</span>{esc(r.name)}</b>'
+                f'<span class="muted">{esc(r.detail)}</span></div>')
+
+    cards = "".join(card(r) for r in results)
     rows = []
     for d in ingest.list_snapshots():
         try:
@@ -640,7 +666,8 @@ def content(marts: dict[str, pd.DataFrame]) -> str:
         f"""<hr><p><small>Snapshot <code>{esc(snapshot)}</code>. Every figure on
 this page is read from <code>data/marts/</code> — none is typed by hand, and the
 page is regenerated from the data on every build. Method and derivations in
-METHODOLOGY.md.</small></p>""",
+METHODOLOGY.md.<br>Built against OpenRouter's public API by an independent
+analyst. Not affiliated with OpenRouter.</small></p>""",
     ])
     return f"<div class='wrap'>{body}</div>"
 
