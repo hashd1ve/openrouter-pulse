@@ -1,0 +1,101 @@
+{
+  "snapshot_date": "2026-08-11",
+  "snapshot_ts": "2026-08-11T07:36:25.173219+00:00",
+  "started_ts": "2026-08-11T07:36:25.173219+00:00",
+  "finished_ts": "2026-08-11T07:38:08.547492+00:00",
+  "duration_seconds": 103.37,
+  "user_agent": "orpulse/0.1 (+https://github.com/hashd1ve/openrouter-pulse; public-data research; daily single capture)",
+  "files": {
+    "models": 68730,
+    "rankings_models_day": 22001,
+    "rankings_models_week": 23385,
+    "rankings_models_month": 24373,
+    "rankings_apps": 3806,
+    "providers": 3515,
+    "endpoint_stats": 465182
+  },
+  "requests_ok": 395,
+  "requests_failed": 13,
+  "bytes_received": 8973999,
+  "failures": [
+    {
+      "label": "endpoint_stats:inclusionai/ling-3.0-tiny-20260806",
+      "path": "/api/frontend/v1/stats/endpoint",
+      "status": 404,
+      "error": "{\"error\":{\"message\":\"No endpoints found for model inclusionai/ling-3.0-tiny-20260806\",\"code\":404}}"
+    },
+    {
+      "label": "endpoint_stats:openrouter/auto-beta",
+      "path": "/api/frontend/v1/stats/endpoint",
+      "status": 404,
+      "error": "{\"error\":{\"message\":\"No endpoints found for model openrouter/auto-beta\",\"code\":404}}"
+    },
+    {
+      "label": "endpoint_stats:cohere/north-mini-code-20260617",
+      "path": "/api/frontend/v1/stats/endpoint",
+      "status": 404,
+      "error": "{\"error\":{\"message\":\"No endpoints found for model cohere/north-mini-code-20260617\",\"code\":404}}"
+    },
+    {
+      "label": "endpoint_stats:openrouter/fusion",
+      "path": "/api/frontend/v1/stats/endpoint",
+      "status": 404,
+      "error": "{\"error\":{\"message\":\"No endpoints found for model openrouter/fusion\",\"code\":404}}"
+    },
+    {
+      "label": "endpoint_stats:nvidia/nemotron-3.5-content-safety-20260604",
+      "path": "/api/frontend/v1/stats/endpoint",
+      "status": 404,
+      "error": "{\"error\":{\"message\":\"No endpoints found for model nvidia/nemotron-3.5-content-safety-20260604\",\"code\":404}}"
+    },
+    {
+      "label": "endpoint_stats:nvidia/nemotron-3-nano-omni-30b-a3b-reasoning-20260428",
+      "path": "/api/frontend/v1/stats/endpoint",
+      "status": 404,
+      "error": "{\"error\":{\"message\":\"No endpoints found for model nvidia/nemotron-3-nano-omni-30b-a3b-reasoning-20260428\",\"code\":404}}"
+    },
+    {
+      "label": "endpoint_stats:openrouter/pareto-code",
+      "path": "/api/frontend/v1/stats/endpoint",
+      "status": 404,
+      "error": "{\"error\":{\"message\":\"No endpoints found for model openrouter/pareto-code\",\"code\":404}}"
+    },
+    {
+      "label": "endpoint_stats:openrouter/free",
+      "path": "/api/frontend/v1/stats/endpoint",
+      "status": 404,
+      "error": "{\"error\":{\"message\":\"No endpoints found for model openrouter/free\",\"code\":404}}"
+    },
+    {
+      "label": "endpoint_stats:openrouter/bodybuilder",
+      "path": "/api/frontend/v1/stats/endpoint",
+      "status": 404,
+      "error": "{\"error\":{\"message\":\"No endpoints found for model openrouter/bodybuilder\",\"code\":404}}"
+    },
+    {
+      "label": "endpoint_stats:nvidia/nemotron-nano-12b-v2-vl",
+      "path": "/api/frontend/v1/stats/endpoint",
+      "status": 404,
+      "error": "{\"error\":{\"message\":\"No endpoints found for model nvidia/nemotron-nano-12b-v2-vl\",\"code\":404}}"
+    },
+    {
+      "label": "endpoint_stats:openai/gpt-5-codex",
+      "path": "/api/frontend/v1/stats/endpoint",
+      "status": 404,
+      "error": "{\"error\":{\"message\":\"No endpoints found for model openai/gpt-5-codex\",\"code\":404}}"
+    },
+    {
+      "label": "endpoint_stats:nvidia/nemotron-nano-9b-v2",
+      "path": "/api/frontend/v1/stats/endpoint",
+      "status": 404,
+      "error": "{\"error\":{\"message\":\"No endpoints found for model nvidia/nemotron-nano-9b-v2\",\"code\":404}}"
+    },
+    {
+      "label": "endpoint_stats:openrouter/auto",
+      "path": "/api/frontend/v1/stats/endpoint",
+      "status": 404,
+      "error": "{\"error\":{\"message\":\"No endpoints found for model openrouter/auto\",\"code\":404}}"
+    }
+  ],
+  "complete": true
+}
