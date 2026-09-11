@@ -1,0 +1,22 @@
+{
+  "snapshot_date": "2026-09-11",
+  "snapshot_ts": "2026-09-11T11:19:30.620539+00:00",
+  "started_ts": "2026-09-11T11:19:30.620539+00:00",
+  "finished_ts": "2026-09-11T11:21:21.958283+00:00",
+  "duration_seconds": 111.34,
+  "user_agent": "orpulse/0.1 (+https://github.com/hashd1ve/openrouter-pulse; public-data research; daily single capture)",
+  "files": {
+    "models": 73195,
+    "rankings_models_day": 25269,
+    "rankings_models_week": 26446,
+    "rankings_models_month": 29011,
+    "rankings_apps": 3978,
+    "providers": 3690,
+    "endpoint_stats": 549846
+  },
+  "requests_ok": 445,
+  "requests_failed": 0,
+  "bytes_received": 12812755,
+  "failures": [],
+  "complete": true
+}
