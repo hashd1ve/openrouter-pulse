@@ -1,10 +1,10 @@
 # Findings — OpenRouter workload fingerprint
 
-*Generated from snapshot `2026-10-17` by `orpulse report`. Every figure on this
+*Generated from snapshot `2026-10-18` by `orpulse report`. Every figure on this
 page is read from `data/marts/`; nothing is typed by hand.*
 
-**Scope of this capture:** 717 model-variants, 684.54 T
-tokens and 32.31 B requests over the trailing 30 days.
+**Scope of this capture:** 719 model-variants, 682.93 T
+tokens and 32.60 B requests over the trailing 30 days.
 
 
 ## 1. The market splits into four workloads, and share of tokens hides it
@@ -21,14 +21,14 @@ with identical token volume can be doing entirely different jobs.
 
 | Archetype | Model-variants | Tokens (30d) | Share | Median P:C | Median tok/req | What it means |
 |---|---|---|---|---|---|---|
-| **agentic** | 96 | 568.35 T | 83.0% | 54.9 | 54,747 | large contexts, terse output, very large interactions |
-| **conversational** | 324 | 109.66 T | 16.0% | 9.4 | 3,834 | moderate context per output token, human-sized interactions |
-| **extractive** | 32 | 3.31 T | 0.5% | 44.6 | 4,889 | context-heavy but small interactions: classification, extraction, routing |
-| **unclassified** | 151 | 3.05 T | 0.4% | — | 34 | insufficient data to classify |
-| **output_heavy** | 114 | 167.06 B | 0.0% | 0.3 | 3,924 | emits one token per two consumed; in practice almost entirely image-output models |
+| **agentic** | 95 | 566.03 T | 82.9% | 53.7 | 54,202 | large contexts, terse output, very large interactions |
+| **conversational** | 327 | 109.25 T | 16.0% | 9.2 | 3,884 | moderate context per output token, human-sized interactions |
+| **extractive** | 33 | 4.41 T | 0.6% | 45.3 | 4,934 | context-heavy but small interactions: classification, extraction, routing |
+| **unclassified** | 151 | 3.07 T | 0.4% | — | 33 | insufficient data to classify |
+| **output_heavy** | 113 | 168.03 B | 0.0% | 0.3 | 4,033 | emits one token per two consumed; in practice almost entirely image-output models |
 
-Models classified as *agentic* account for **83.0% of all tokens**
-while being 96 of 717 model-variants. Conversational
+Models classified as *agentic* account for **82.9% of all tokens**
+while being 95 of 719 model-variants. Conversational
 traffic, which is what most people picture when they think "LLM API", is
 16.0%.
 
@@ -43,27 +43,27 @@ Ranked by tokens of context consumed per token produced, among models above
 
 | Model | P:C ratio | Tokens/request | Tokens (30d) | Archetype |
 |---|---|---|---|---|
-| `upstage/solar-decide-20260928` | 1,985.6 | 4,701 | 15.24 B | extractive |
-| `upstage/solar-decide-flash-20261008` | 1,411.3 | 3,528 | 6.60 B | extractive |
-| `perplexity/pplx-decider-v1.1-27b-20261006` | 1,196.6 | 4,325 | 249.80 B | extractive |
+| `upstage/solar-decide-20260928` | 1,958.3 | 4,563 | 15.47 B | extractive |
+| `scaledown/classify-1-20260928` | 1,531.3 | 6,070 | 6.52 B | extractive |
+| `upstage/solar-decide-flash-20261008` | 1,403.6 | 3,412 | 6.79 B | extractive |
 | `perplexity/pplx-decider-v1-27b-20261001` | 1,155.6 | 4,655 | 9.10 B | extractive |
-| `togethercomputer/tev1-4b-experimental-20260923` | 549.0 | 2,892 | 6.34 B | extractive |
-| `inception/mercury-decide-20260930` | 371.1 | 3,204 | 43.15 B | extractive |
-| `microsoft/microsoft-decision-1-20261009` | 346.5 | 1,230 | 24.24 B | extractive |
-| `meta-llama/llama-guard-4-12b` | 236.6 | 811 | 7.47 B | extractive |
-| `nvidia/nemotron-3-ultra-550b-a55b-20260604` | 212.3 | 134,244 | 25.35 T | agentic |
-| `inception/mercury-decide-20260930` | 197.4 | 1,014 | 19.39 B | extractive |
+| `perplexity/pplx-decider-v1.1-27b-20261006` | 1,141.1 | 3,834 | 257.20 B | extractive |
+| `perplexity/pplx-decider-flash-v1.2-20261016` | 648.8 | 2,191 | 2.88 B | extractive |
+| `togethercomputer/tev1-4b-experimental-20260923` | 541.5 | 2,787 | 6.39 B | extractive |
+| `inception/mercury-decide-20260930` | 372.9 | 3,180 | 44.83 B | extractive |
+| `perplexity/pplx-decider-v1.2-20261016` | 350.3 | 1,556 | 6.37 B | extractive |
+| `microsoft/microsoft-decision-1-20261009` | 346.5 | 1,207 | 25.83 B | extractive |
 
 **Why both axes.** The top of this ranking is `upstage/solar-decide-20260928` at
-1,985.6 tokens of context per token written, but its interactions
-average only 4,701 tokens. A high P:C ratio alone
+1,958.3 tokens of context per token written, but its interactions
+average only 4,563 tokens. A high P:C ratio alone
 cannot tell a coding agent from a safety classifier; both read far more than they
 write. Reading a lot per call and reading a lot per token produced are different
 properties, and only their conjunction identifies agentic use.
 
 
-Contrast `nvidia/nemotron-3-ultra-550b-a55b-20260604`: 212.3 tokens of context per token
-written, in interactions averaging 134,244 tokens, which
+Contrast `nvidia/nemotron-3-ultra-550b-a55b-20260604`: 211.4 tokens of context per token
+written, in interactions averaging 134,097 tokens, which
 is 29× larger.
 That shape belongs to a model sitting inside a loop, re-reading a large
 accumulated state every turn, not to a classifier answering a short question.
@@ -87,13 +87,13 @@ arithmetic alone, and the analysis then "discovers" that new models grow.
 Across 252 ratable model-variants (at least
 7 days old and above
 1,000,000 monthly requests), momentum has a
-median of **0.89** with a p25–p75 range of 0.69–1.09.
+median of **0.74** with a p25–p75 range of 0.52–1.01.
 A median near 1.0 is the expected signature of a market that is neither
 collapsing nor exploding in aggregate.
 
 
-For the 25 model-variants younger than 30 days, the uncorrected
-formula inflates momentum by a median **1.20×**. That is the size of the
+For the 24 model-variants younger than 30 days, the uncorrected
+formula inflates momentum by a median **1.18×**. That is the size of the
 artefact the correction removes.
 
 
@@ -101,33 +101,33 @@ artefact the correction removes.
 
 | Model | Momentum | Tokens (30d) | Age (days) | Archetype |
 |---|---|---|---|---|
-| `qwen/qwen3.6-35b-a3b-20260415` | 10.73× | 1.08 T | 173 | conversational |
-| `google/gemma-2-27b-it` | 5.84× | 533.06 M | 826 | conversational |
-| `inception/mercury-2-20260304` | 3.59× | 10.66 B | 227 | conversational |
-| `bytedance-seed/seed-2.0-mini-20260224` | 3.49× | 18.14 B | 233 | conversational |
-| `google/gemini-3.8-flash-20260902` | 2.51× | 12.06 B | 45 | conversational |
-| `nvidia/nemotron-3.5-content-safety-20260604` | 2.27× | 10.61 B | 135 | conversational |
-| `meta-llama/llama-4-scout-17b-16e-instruct` | 2.21× | 55.43 B | 560 | conversational |
-| `openai/gpt-6-sol-20260922` | 2.15× | 4.27 B | 25 | conversational |
+| `openai/gpt-6-luna-20260922` | 5.75× | 208.87 B | 26 | conversational |
+| `inception/mercury-2-20260304` | 5.17× | 12.48 B | 228 | conversational |
+| `qwen/qwen3.6-35b-a3b-20260415` | 3.42× | 1.21 T | 174 | extractive |
+| `deepseek/deepseek-v4.1-flash-20260910` | 3.26× | 12.44 B | 38 | output_heavy |
+| `xiaomi/mimo-v2.6-pro-ultraspeed-20260921` | 3.05× | 405.94 B | 27 | agentic |
+| `microsoft/phi-4` | 2.70× | 6.87 B | 646 | conversational |
+| `openai/gpt-6-sol-20260922` | 2.09× | 4.64 B | 26 | conversational |
+| `qwen/qwen-2.5-72b-instruct` | 1.84× | 11.41 B | 759 | conversational |
 
 **Fading** — lowest momentum among ratable models:
 
 | Model | Momentum | Tokens (30d) | Age (days) | Archetype |
 |---|---|---|---|---|
-| `perceptron/perceptron-mk1-20260512` | 0.03× | 6.84 B | 158 | extractive |
-| `tencent/hy-mt2-7b-20260521` | 0.05× | 1.31 B | 59 | conversational |
-| `tencent/hy-mt2-1.8b-20260521` | 0.07× | 1.52 B | 58 | conversational |
-| `stepfun/step-5-preview-20261008` | 0.08× | 20.29 T | 9 | agentic |
-| `openai/gpt-5.6-luna-20260709` | 0.09× | 48.62 B | 100 | conversational |
-| `google/gemini-3.7-flash-20260813` | 0.10× | 11.61 B | 65 | output_heavy |
-| `nvidia/nemotron-3-ultra-550b-a55b-20260604` | 0.10× | 25.35 T | 135 | agentic |
-| `inclusionai/ling-3.0-flash-vl-20260910` | 0.13× | 126.98 B | 37 | conversational |
+| `google/gemini-3.7-flash-20260813` | 0.00× | 11.57 B | 66 | output_heavy |
+| `google/gemini-3.1-flash-lite-20260507` | 0.00× | 22.34 B | 164 | conversational |
+| `google/gemini-2.5-flash` | 0.00× | 6.54 B | 488 | conversational |
+| `stepfun/step-5-preview-20261008` | 0.00× | 20.30 T | 10 | agentic |
+| `google/gemini-3.8-flash-20260902` | 0.03× | 11.73 B | 46 | conversational |
+| `tencent/hy-mt2-7b-20260521` | 0.04× | 1.17 B | 60 | conversational |
+| `perceptron/perceptron-mk1-20260512` | 0.04× | 6.83 B | 159 | extractive |
+| `tencent/hy-mt2-1.8b-20260521` | 0.05× | 1.30 B | 59 | conversational |
 
 ## 4. Attention and money are different markets
 
 Multiplying each model's tokens by its list price gives the gross value its
-traffic represents: **$299.3 M per month** across
-486 priced model-variants.
+traffic represents: **$330.5 M per month** across
+488 priced model-variants.
 
 This is an upper bound, not revenue: it ignores prompt-cache discounts, batch
 pricing, BYOK traffic, negotiated rates and OpenRouter's own margin. The column
@@ -135,23 +135,23 @@ is called `implied_gross_value` and never `revenue` for that reason.
 
 | Lab | Share of tokens | Share of implied value | Value per token of attention |
 |---|---|---|---|
-| `openai` | 11.0% | 30.3% | 2.76x |
-| `anthropic` | 5.3% | 28.5% | 5.33x |
-| `tencent` | 7.4% | 11.2% | 1.51x |
-| `stepfun` | 3.1% | 6.9% | 2.23x |
-| `google` | 4.4% | 5.1% | 1.17x |
-| `xiaomi` | 7.3% | 3.4% | 0.47x |
-| `z-ai` | 12.0% | 3.3% | 0.27x |
-| `deepseek` | 26.2% | 3.2% | 0.12x |
+| `anthropic` | 5.5% | 38.0% | 6.92x |
+| `openai` | 10.8% | 23.6% | 2.18x |
+| `tencent` | 7.2% | 9.9% | 1.37x |
+| `stepfun` | 3.1% | 6.2% | 2.01x |
+| `deepseek` | 26.5% | 4.6% | 0.17x |
+| `google` | 4.4% | 3.9% | 0.90x |
+| `xiaomi` | 7.4% | 3.2% | 0.43x |
+| `z-ai` | 11.9% | 3.1% | 0.26x |
 
 Concentration makes the same point without naming a winner. Measured by tokens,
 the labs sit at an HHI of **1,061**. Measured by money they sit at
-**3,638**, past the 2,500 mark competition authorities treat as
-highly concentrated, and the largest lab takes **58.1%** of
+**3,546**, past the 2,500 mark competition authorities treat as
+highly concentrated, and the largest lab takes **56.8%** of
 the value against 17.2% of the tokens.
 
 The Gini coefficient across models is **0.935** by tokens
-and **0.937** by value. Both are extreme; a
+and **0.940** by value. Both are extreme; a
 national income distribution above 0.6 is considered severe.
 
 
@@ -160,7 +160,7 @@ national income distribution above 0.6 is considered severe.
 Traffic is overwhelmingly prompt-heavy, and prompt tokens cost less than
 completions. Blended across each model's real token mix, the price actually paid
 per token is a median **0.35x** the headline output price, so the
-sticker overstates unit cost by about **2.9x**.
+sticker overstates unit cost by about **2.8x**.
 
 Anyone comparing models on `$/M output` is getting this wrong.
 
@@ -169,14 +169,14 @@ Anyone comparing models on `$/M output` is getting this wrong.
 
 Dividing mean tokens per request by the advertised context length asks how much
 of the window the traffic actually touches. Token-weighted across the market:
-**6.59%**.
+**6.44%**.
 
 | Archetype | Median share of the advertised window used |
 |---|---|
-| **agentic** | 7.30% |
-| **extractive** | 2.34% |
+| **agentic** | 7.25% |
+| **extractive** | 2.92% |
 | **conversational** | 1.65% |
-| **output_heavy** | 0.43% |
+| **output_heavy** | 0.41% |
 
 The pattern holds even where it should not: models bought for their long context
 still leave nine tenths of it idle.
@@ -192,19 +192,19 @@ For models served by more than one provider, an endpoint is *dominated* when
 another endpoint for the same model is both cheaper per completion token and
 faster at the median. There is no rational reason to route traffic to it.
 
-Of 1,105 endpoints serving multi-provider models,
-**755 are dominated** (68.3%).
+Of 1,050 endpoints serving multi-provider models,
+**701 are dominated** (66.8%).
 
 | Model | Dominated endpoint | $/M out | p50 throughput | Beaten by | # better |
 |---|---|---|---|---|---|
-| `z-ai/glm-5.3-20260816` | Relace | $19.90 | 28 tok/s | Sail Research | 42 |
-| `~z-ai/glm-latest` | Relace | $19.90 | 28 tok/s | Sail Research | 42 |
-| `z-ai/glm-5.3-20260816` | Makora | $4.40 | 27 tok/s | Sail Research | 34 |
-| `~z-ai/glm-latest` | Makora | $4.40 | 27 tok/s | Sail Research | 34 |
-| `z-ai/glm-5.3-20260816` | Fireworks | $4.40 | 45 tok/s | Sail Research | 32 |
-| `~z-ai/glm-latest` | Fireworks | $4.40 | 45 tok/s | Sail Research | 32 |
-| `deepseek/deepseek-v4.1-flash-20260910` | Baidu | $1.20 | 66 tok/s | Decart | 30 |
-| `z-ai/glm-5.3-20260816` | Cloudflare | $4.40 | 47 tok/s | Sail Research | 30 |
+| `z-ai/glm-5.3-20260816` | Cloudflare | $4.40 | 28 tok/s | Sail Research | 30 |
+| `~z-ai/glm-latest` | Cloudflare | $4.40 | 28 tok/s | Sail Research | 30 |
+| `z-ai/glm-5.3-20260816` | AtlasCloud | $4.40 | 45 tok/s | Sail Research | 29 |
+| `~z-ai/glm-latest` | AtlasCloud | $4.40 | 44 tok/s | Sail Research | 29 |
+| `z-ai/glm-5.3-flash-20260826` | Near AI | $0.50 | 15 tok/s | OpenInference | 28 |
+| `~z-ai/glm-flash-latest` | Near AI | $0.50 | 15 tok/s | OpenInference | 28 |
+| `z-ai/glm-5.3-flash-20260826` | Reka | $1.60 | 44 tok/s | OpenInference | 28 |
+| `~z-ai/glm-flash-latest` | Reka | $1.60 | 42 tok/s | OpenInference | 28 |
 
 *Caveat that matters:* these percentiles come from a 30-minute rolling window,
 so one capture samples half an hour. A single snapshot suggests where to look;
@@ -219,8 +219,8 @@ measurable, so it is measured: the share of models changing archetype between
 consecutive captures.
 
 
-Between `2026-10-15` and `2026-10-17`,
-**2.90%** of 551 compared
+Between `2026-10-17` and `2026-10-18`,
+**1.95%** of 565 compared
 models changed archetype (target: under 5%).
 
 
@@ -235,21 +235,21 @@ or one request, one vote.
 
 | Segment | Weighting | Elasticity | 95% CI | R² | n | Clears zero |
 |---|---|---|---|---|---|---|
-| **agentic** | request weighted | -0.55 | -0.81 to -0.28 | 0.237 | 81 | yes |
-| **all** | request weighted | -0.09 | -0.35 to +0.18 | 0.002 | 451 | no |
-| **conversational** | request weighted | -0.30 | -0.65 to +0.04 | 0.034 | 294 | no |
-| **extractive** | request weighted | +0.57 | -0.01 to +1.15 | 0.265 | 19 | no |
-| **output_heavy** | request weighted | -0.25 | -0.43 to -0.07 | 0.109 | 57 | yes |
-| **agentic** | unweighted | -0.43 | -0.77 to -0.09 | 0.052 | 81 | yes |
-| **all** | unweighted | -0.92 | -1.25 to -0.60 | 0.073 | 451 | yes |
-| **conversational** | unweighted | -0.85 | -1.20 to -0.51 | 0.086 | 294 | yes |
-| **extractive** | unweighted | +0.36 | -0.23 to +0.96 | 0.070 | 19 | no |
-| **output_heavy** | unweighted | -1.13 | -2.00 to -0.26 | 0.080 | 57 | yes |
+| **agentic** | request weighted | -0.63 | -0.88 to -0.38 | 0.461 | 86 | yes |
+| **all** | request weighted | -0.36 | -0.81 to +0.09 | 0.046 | 457 | no |
+| **conversational** | request weighted | -0.19 | -0.52 to +0.13 | 0.013 | 297 | no |
+| **extractive** | request weighted | +0.33 | -0.32 to +0.99 | 0.089 | 19 | no |
+| **output_heavy** | request weighted | -0.23 | -0.37 to -0.09 | 0.127 | 55 | yes |
+| **agentic** | unweighted | -0.35 | -0.66 to -0.03 | 0.041 | 86 | yes |
+| **all** | unweighted | -0.95 | -1.27 to -0.64 | 0.080 | 457 | yes |
+| **conversational** | unweighted | -0.87 | -1.19 to -0.54 | 0.085 | 297 | yes |
+| **extractive** | unweighted | +0.26 | -0.35 to +0.86 | 0.033 | 19 | no |
+| **output_heavy** | unweighted | -1.27 | -2.09 to -0.44 | 0.110 | 55 | yes |
 
 **The reversal in agentic traffic is the result worth the space.** Counting
-models equally, price explains nothing (-0.43, interval
--0.77 to -0.09, straddling zero). Weighting by requests, the
-elasticity is **-0.55** (-0.81 to -0.28) and
+models equally, price explains nothing (-0.35, interval
+-0.66 to -0.03, straddling zero). Weighting by requests, the
+elasticity is **-0.63** (-0.88 to -0.38) and
 clears zero comfortably.
 
 Agentic *models* are not price-sensitive. Agentic *volume* is. That is what a
@@ -274,10 +274,10 @@ leukemia trial, which is what `tests/test_analytics.py` asserts.
 
 | Death defined as | Events | Censored | Alive at 180d | Alive at 365d |
 |---|---|---|---|---|
-| ≥2 days silent | 75 | 410 | 92.0% | 84.5% |
-| ≥3 days silent | 69 | 416 | 92.8% | 86.2% |
-| ≥7 days silent | 62 | 423 | 93.9% | 87.3% |
-| ≥14 days silent | 23 | 462 | 95.5% | 94.7% |
+| ≥2 days silent | 82 | 406 | 90.7% | 82.5% |
+| ≥3 days silent | 73 | 415 | 92.2% | 85.2% |
+| ≥7 days silent | 61 | 427 | 94.1% | 87.5% |
+| ≥14 days silent | 22 | 466 | 95.8% | 94.9% |
 
 **Why this is preliminary.** Death is inferred from the last day with traffic,
 and two biases pull against each other. A model silent for more than about 30
