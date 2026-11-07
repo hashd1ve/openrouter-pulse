@@ -1,0 +1,29 @@
+{
+  "snapshot_date": "2026-11-07",
+  "snapshot_ts": "2026-11-07T12:58:12.562273+00:00",
+  "started_ts": "2026-11-07T12:58:12.562273+00:00",
+  "finished_ts": "2026-11-07T13:00:12.580895+00:00",
+  "duration_seconds": 120.02,
+  "user_agent": "orpulse/0.1 (+https://github.com/hashd1ve/openrouter-pulse; public-data research; daily single capture)",
+  "files": {
+    "models": 80820,
+    "rankings_models_day": 34831,
+    "rankings_models_week": 37570,
+    "rankings_models_month": 40799,
+    "rankings_apps": 3891,
+    "providers": 4195,
+    "endpoint_stats": 716741
+  },
+  "requests_ok": 465,
+  "requests_failed": 1,
+  "bytes_received": 17197190,
+  "failures": [
+    {
+      "label": "endpoint_stats:openai/gpt-4o-2024-05-13",
+      "path": "/api/frontend/v1/stats/endpoint",
+      "status": 520,
+      "error": ""
+    }
+  ],
+  "complete": true
+}
