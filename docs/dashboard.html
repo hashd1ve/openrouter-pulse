@@ -72,6 +72,10 @@ figcaption{font-size:13.5px;color:var(--muted);margin-top:10px;max-width:70ch}
 .band{fill:var(--s1);fill-opacity:.14}
 .censor{stroke:var(--s1);stroke-width:1.5;stroke-opacity:.75}
 .empty{color:var(--muted);font-style:italic}
+.bump{fill:none;stroke:var(--neutral);stroke-width:1.75;stroke-opacity:.6;stroke-linejoin:round}
+.bump.hl{stroke:var(--s1);stroke-opacity:1;stroke-width:2.5}
+.bump-dot{fill:var(--neutral)}
+.bump.hl-dot{fill:var(--s1)}
 
 .legend{display:flex;flex-wrap:wrap;gap:14px;margin:12px 0 0;
   font-size:13px;color:var(--muted)}
@@ -267,10 +271,10 @@ being biased.</p></div>
 91% of the tokens, and its interactions
 run <em>larger</em> than the paid tier's. A funnel would look the opposite: small
 free trials graduating into heavy paid usage. This looks like substitution.</p>
-
-<h2>8 · The pipeline's own vitals</h2>
+<h2>8 · What's trending on Hugging Face</h2><p class="empty">No Hugging Face capture yet. The daily job records the trending list from 2026-11-24 on.</p>
+<h2>9 · The pipeline's own vitals</h2>
 <p>A dashboard that cannot say whether its data is current is a liability.</p>
-<div class="checks"><div class="check "><b><span class="pill ">pass</span>grain_unique</b><span class="muted">0 duplicate rows on snapshot_date+usage_window+model_permaslug+variant out of 199986</span></div><div class="check "><b><span class="pill ">pass</span>keys_not_null</b><span class="muted">0 rows with a null key column</span></div><div class="check "><b><span class="pill ">pass</span>non_negative_measures</b><span class="muted">0 rows with a negative measure</span></div><div class="check "><b><span class="pill ">pass</span>nested_windows_consistent</b><span class="muted">0 rows with day&gt;week, 0 with week&gt;month (of 71231 model-variants, 1% tolerance)</span></div><div class="check "><b><span class="pill ">pass</span>coverage_stable</b><span class="muted">662 -&gt; 662 models (0.0% drift, tolerance 20%)</span></div><div class="check warn"><b><span class="pill warn">warn</span>freshness</b><span class="muted">latest snapshot is 116.1h old (limit 48h)</span></div><div class="check "><b><span class="pill ">pass</span>fingerprint_coverage</b><span class="muted">595/782 model-variants classified, covering 99.5% of monthly tokens</span></div><div class="check "><b><span class="pill ">pass</span>archetype_stability</b><span class="muted">0.84% of models changed archetype since the previous capture (target &lt;=5%)</span></div></div>
+<div class="checks"><div class="check "><b><span class="pill ">pass</span>grain_unique</b><span class="muted">0 duplicate rows on snapshot_date+usage_window+model_permaslug+variant out of 199986</span></div><div class="check "><b><span class="pill ">pass</span>keys_not_null</b><span class="muted">0 rows with a null key column</span></div><div class="check "><b><span class="pill ">pass</span>non_negative_measures</b><span class="muted">0 rows with a negative measure</span></div><div class="check "><b><span class="pill ">pass</span>nested_windows_consistent</b><span class="muted">0 rows with day&gt;week, 0 with week&gt;month (of 71231 model-variants, 1% tolerance)</span></div><div class="check "><b><span class="pill ">pass</span>coverage_stable</b><span class="muted">662 -&gt; 662 models (0.0% drift, tolerance 20%)</span></div><div class="check warn"><b><span class="pill warn">warn</span>freshness</b><span class="muted">latest snapshot is 116.3h old (limit 48h)</span></div><div class="check "><b><span class="pill ">pass</span>fingerprint_coverage</b><span class="muted">595/782 model-variants classified, covering 99.5% of monthly tokens</span></div><div class="check "><b><span class="pill ">pass</span>archetype_stability</b><span class="muted">0.84% of models changed archetype since the previous capture (target &lt;=5%)</span></div><div class="check warn"><b><span class="pill warn">warn</span>hf_trending_captured</b><span class="muted">no Hugging Face trending capture in the archive</span></div></div>
 <details><summary>Capture manifests — every gap in the series has a recorded cause</summary>
 <div class="scroll"><table><thead><tr><th>Snapshot</th><th class="num">Requests OK</th>
 <th class="num">Failed</th><th class="num">Volume</th><th class="num">Duration</th>
@@ -290,6 +294,9 @@ aggregate.</li>
 <li><strong>Four schema fields are dormant</strong> — cache, reasoning and
 tool-call counters are present but zero for every model. Nothing is built on
 them; a contract test watches for them waking up.</li>
+<li><strong>Trending is the Hub's own score</strong>, a recent-likes-and-downloads
+blend it does not document. The capture keeps the top 100 a day; a model's
+trajectory below that is not observed.</li>
 <li><strong>Traffic is not users.</strong> One agentic application can outproduce a
 million chat sessions. Nothing here measures adoption or satisfaction.</li>
 <li><strong>Archetype cuts are frozen, not re-fitted.</strong> Boundary models
