@@ -126,7 +126,7 @@ artefact the correction removes.
 ## 4. Attention and money are different markets
 
 Multiplying each model's tokens by its list price gives the gross value its
-traffic represents: **$331.1 M per month** across
+traffic represents: **$494.6 M per month** across
 496 priced model-variants.
 
 This is an upper bound, not revenue: it ignores prompt-cache discounts, batch
@@ -135,19 +135,19 @@ is called `implied_gross_value` and never `revenue` for that reason.
 
 | Lab | Share of tokens | Share of implied value | Value per token of attention |
 |---|---|---|---|
-| `anthropic` | 7.0% | 34.1% | 4.89x |
-| `openai` | 9.0% | 22.2% | 2.47x |
-| `tencent` | 14.6% | 10.7% | 0.73x |
-| `stepfun` | 2.9% | 8.0% | 2.72x |
-| `deepseek` | 36.0% | 6.5% | 0.18x |
-| `google` | 3.3% | 5.9% | 1.81x |
-| `z-ai` | 8.7% | 2.7% | 0.31x |
-| `moonshotai` | 2.3% | 2.4% | 1.06x |
+| `anthropic` | 7.0% | 40.8% | 5.85x |
+| `openai` | 9.0% | 16.1% | 1.80x |
+| `deepseek` | 36.0% | 13.7% | 0.38x |
+| `tencent` | 14.6% | 7.1% | 0.49x |
+| `google` | 3.3% | 6.2% | 1.91x |
+| `stepfun` | 2.9% | 5.3% | 1.82x |
+| `nvidia` | 3.7% | 2.1% | 0.57x |
+| `moonshotai` | 2.3% | 1.6% | 0.71x |
 
 Concentration makes the same point without naming a winner. Measured by tokens,
 the labs sit at an HHI of **1,061**. Measured by money they sit at
-**3,087**, past the 2,500 mark competition authorities treat as
-highly concentrated, and the largest lab takes **51.9%** of
+**3,200**, past the 2,500 mark competition authorities treat as
+highly concentrated, and the largest lab takes **53.5%** of
 the value against 17.2% of the tokens.
 
 The Gini coefficient across models is **0.935** by tokens
@@ -169,14 +169,14 @@ Anyone comparing models on `$/M output` is getting this wrong.
 
 Dividing mean tokens per request by the advertised context length asks how much
 of the window the traffic actually touches. Token-weighted across the market:
-**7.11%**.
+**7.48%**.
 
 | Archetype | Median share of the advertised window used |
 |---|---|
-| **agentic** | 7.93% |
+| **agentic** | 7.19% |
 | **conversational** | 1.61% |
 | **extractive** | 1.54% |
-| **output_heavy** | 1.14% |
+| **output_heavy** | 1.04% |
 
 The pattern holds even where it should not: models bought for their long context
 still leave nine tenths of it idle.
@@ -235,26 +235,24 @@ or one request, one vote.
 
 | Segment | Weighting | Elasticity | 95% CI | R² | n | Clears zero |
 |---|---|---|---|---|---|---|
-| **agentic** | request weighted | -0.61 | -0.90 to -0.32 | 0.438 | 89 | yes |
-| **all** | request weighted | -0.61 | -1.04 to -0.19 | 0.142 | 461 | yes |
-| **conversational** | request weighted | -0.36 | -0.75 to +0.02 | 0.068 | 289 | no |
-| **extractive** | request weighted | -0.95 | -1.38 to -0.53 | 0.530 | 26 | yes |
-| **output_heavy** | request weighted | -0.29 | -0.48 to -0.11 | 0.188 | 57 | yes |
-| **agentic** | unweighted | -0.69 | -1.04 to -0.35 | 0.141 | 89 | yes |
-| **all** | unweighted | -0.57 | -0.81 to -0.34 | 0.051 | 461 | yes |
-| **conversational** | unweighted | -0.74 | -0.98 to -0.51 | 0.120 | 289 | yes |
-| **extractive** | unweighted | -0.11 | -1.18 to +0.96 | 0.001 | 26 | no |
-| **output_heavy** | unweighted | -0.41 | -0.89 to +0.08 | 0.039 | 57 | no |
+| **agentic** | request weighted | -0.36 | -0.60 to -0.12 | 0.136 | 96 | yes |
+| **all** | request weighted | -0.21 | -0.54 to +0.13 | 0.016 | 475 | no |
+| **conversational** | request weighted | -0.21 | -0.52 to +0.11 | 0.024 | 296 | no |
+| **extractive** | request weighted | -0.97 | -1.35 to -0.59 | 0.598 | 26 | yes |
+| **output_heavy** | request weighted | -0.28 | -0.53 to -0.04 | 0.109 | 57 | yes |
+| **agentic** | unweighted | -0.45 | -0.79 to -0.11 | 0.069 | 96 | yes |
+| **all** | unweighted | -0.56 | -0.78 to -0.34 | 0.052 | 475 | yes |
+| **conversational** | unweighted | -0.70 | -0.93 to -0.47 | 0.115 | 296 | yes |
+| **extractive** | unweighted | -0.18 | -1.32 to +0.95 | 0.003 | 26 | no |
+| **output_heavy** | unweighted | -0.45 | -0.93 to +0.04 | 0.043 | 57 | no |
 
-**The reversal in agentic traffic is the result worth the space.** Counting
-models equally, price explains nothing (-0.69, interval
--1.04 to -0.35, straddling zero). Weighting by requests, the
-elasticity is **-0.61** (-0.90 to -0.32) and
-clears zero comfortably.
+**Agentic traffic, both ways.** Counting models equally, the elasticity is
+-0.45 (-0.79 to -0.11); weighting by requests it is
+**-0.36** (-0.60 to -0.12). The reversal this section
+looks for, models indifferent to price while their volume is not, needs the first
+interval to straddle zero and the second to clear it. In this capture
+both clear zero.
 
-Agentic *models* are not price-sensitive. Agentic *volume* is. That is what a
-small number of very large consumers optimising unit cost looks like, and it is
-invisible to any analysis treating each model as one data point.
 
 **Read this as association, not cause.** Nothing here observes one model at two
 prices; it compares models that differ in price and in everything else, quality
