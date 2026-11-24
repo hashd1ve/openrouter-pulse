@@ -21,12 +21,15 @@ def usage_df(rows):
 
 
 def row(date="2026-07-31", window="month", model="a/m-1", variant="standard",
-        prompt=1000, completion=100, requests=10):
-    return {
+        prompt=1000, completion=100, requests=10, ts=None):
+    r = {
         "snapshot_date": date, "usage_window": window, "model_permaslug": model,
         "variant": variant, "prompt_tokens": prompt, "completion_tokens": completion,
         "requests": requests,
     }
+    if ts is not None:
+        r["source_last_activity_ts"] = ts
+    return r
 
 
 def nested_ok(date="2026-07-31", model="a/m-1"):
@@ -86,6 +89,50 @@ def test_nested_windows_catches_week_exceeding_month():
     ]
     result = quality.check_nested_windows(usage_df(rows))
     assert not result.passed
+
+
+# Since 2026-11-21 `view=day` is a rolling 24 hours closing at the latest hour,
+# while week and month still close at midnight.
+DAY_TS, MIDNIGHT = "2026-11-24 18:00:00", "2026-11-23 00:00:00"
+
+
+def surge(date="2026-11-24", day_ts=DAY_TS, model="a/m-1"):
+    """A model that did more in the last rolling day than in the closed week."""
+    return [
+        row(date, "day", model, prompt=5000, completion=500, ts=day_ts),
+        row(date, "week", model, prompt=700, completion=70, ts=MIDNIGHT),
+        row(date, "month", model, prompt=3000, completion=300, ts=MIDNIGHT),
+    ]
+
+
+def test_rolling_day_that_closes_after_the_week_is_not_compared():
+    """The failure of 2026-11-21..24: a surge in hours the week does not cover."""
+    result = quality.check_nested_windows(usage_df(surge()))
+    assert result.passed
+    assert "not compared on 1 capture" in result.detail
+
+
+def test_day_exceeding_week_still_fails_when_both_close_together():
+    result = quality.check_nested_windows(usage_df(surge(day_ts=MIDNIGHT)))
+    assert not result.passed and result.blocking
+
+
+def test_rolling_day_does_not_hide_week_exceeding_month():
+    rows = [
+        row("2026-11-24", "day", prompt=100, completion=10, ts=DAY_TS),
+        row("2026-11-24", "week", prompt=9000, completion=900, ts=MIDNIGHT),
+        row("2026-11-24", "month", prompt=3000, completion=300, ts=MIDNIGHT),
+    ]
+    result = quality.check_nested_windows(usage_df(rows))
+    assert not result.passed and "1 with week>month" in result.detail
+
+
+def test_skipping_is_per_capture_not_per_archive():
+    """A rolling day today must not excuse a real violation on an aligned day."""
+    old = surge(date="2026-11-19", day_ts="2026-11-18 00:00:00")
+    old = [dict(r, source_last_activity_ts="2026-11-18 00:00:00") for r in old]
+    result = quality.check_nested_windows(usage_df(old + surge()))
+    assert not result.passed and "1 rows with day>week" in result.detail
 
 
 def test_nested_windows_tolerates_small_recomputation_skew():

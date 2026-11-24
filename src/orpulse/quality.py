@@ -78,12 +78,38 @@ def check_non_negative(usage: pd.DataFrame) -> CheckResult:
     )
 
 
+def window_ends(usage: pd.DataFrame) -> pd.DataFrame | None:
+    """When each window of each capture closes: the latest activity stamp it carries.
+
+    One row per snapshot_date, one column per window. None when the usage table
+    predates `source_last_activity_ts`, in which case every window is assumed to
+    close at the same moment, which is what the feed did until 2026-11-20.
+    """
+    if "source_last_activity_ts" not in usage.columns:
+        return None
+    stamped = usage.dropna(subset=["source_last_activity_ts"])
+    if stamped.empty:
+        return None
+    return (
+        stamped.groupby(["snapshot_date", "usage_window"])["source_last_activity_ts"]
+        .max()
+        .unstack()
+    )
+
+
 def check_nested_windows(usage: pd.DataFrame, tolerance: float = 0.01) -> CheckResult:
-    """`day <= week <= month` for the same model and variant.
+    """`day <= week <= month` for the same model and variant, where the windows nest.
 
     A 1% tolerance absorbs the case where OpenRouter recomputes the three
     windows at slightly different moments. Anything larger means the semantics
     of the feed changed and every downstream number is suspect.
+
+    Nesting only holds when the shorter window closes no later than the longer
+    one. Since 2026-11-21 `view=day` is a rolling 24 hours that closes at the
+    latest hour, while week and month still close at midnight, so the day can
+    run past the week and a model that surges in those hours legitimately has
+    day > week. Those pairs are not compared; the detail says how many
+    captures were skipped, and the contract test pins the new semantics.
     """
     pivot = usage.pivot_table(
         index=["snapshot_date", "model_permaslug", "variant"],
@@ -100,16 +126,33 @@ def check_nested_windows(usage: pd.DataFrame, tolerance: float = 0.01) -> CheckR
                 f"window '{w}' missing from the snapshot entirely",
             )
     limit = 1 + tolerance
-    bad_dw = int((pivot["day"] > pivot["week"] * limit).sum())
-    bad_wm = int((pivot["week"] > pivot["month"] * limit).sum())
+    dates = pivot.index.get_level_values("snapshot_date")
+    ends = window_ends(usage)
+
+    def runs_past(short: str, long: str) -> set:
+        if ends is None or short not in ends.columns or long not in ends.columns:
+            return set()
+        return set(ends.index[ends[short] > ends[long]])
+
+    skip_dw, skip_wm = runs_past("day", "week"), runs_past("week", "month")
+    bad_dw = int(((pivot["day"] > pivot["week"] * limit) & ~dates.isin(skip_dw)).sum())
+    bad_wm = int(((pivot["week"] > pivot["month"] * limit) & ~dates.isin(skip_wm)).sum())
     total = bad_dw + bad_wm
-    return CheckResult(
-        "nested_windows_consistent",
-        total == 0,
-        ERROR,
+    detail = (
         f"{bad_dw} rows with day>week, {bad_wm} with week>month "
-        f"(of {len(pivot)} model-variants, {tolerance:.0%} tolerance)",
+        f"(of {len(pivot)} model-variants, {tolerance:.0%} tolerance)"
     )
+    if skip_dw:
+        detail += (
+            f"; day<=week not compared on {len(skip_dw)} capture(s) whose rolling "
+            f"day window closes after the week (first {min(skip_dw)})"
+        )
+    if skip_wm:
+        detail += (
+            f"; week<=month not compared on {len(skip_wm)} capture(s) whose week "
+            f"closes after the month (first {min(skip_wm)})"
+        )
+    return CheckResult("nested_windows_consistent", total == 0, ERROR, detail)
 
 
 def check_coverage(usage: pd.DataFrame) -> CheckResult:

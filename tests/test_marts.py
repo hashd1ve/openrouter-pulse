@@ -201,6 +201,37 @@ def test_fingerprint_joins_only_the_current_version(fixture_snapshot):
     assert fp.iloc[0].context_length == 2000
 
 
+def test_variant_entries_in_the_catalogue_do_not_move_the_list_price(fixture_snapshot):
+    """`x`, `x:batch` and `x:free` share a slug; the list price is the bare one.
+
+    Before 2026-11-24 dim_model picked among them at random on every build, so
+    two builds of the same archive disagreed on implied value by millions.
+    """
+    days = ("2026-07-29", "2026-07-30", "2026-07-31")
+    entries = []
+    for d in days:
+        # Catalogue order varies between captures; the result must not.
+        variants = [
+            model_row(date=d, model_id="a/m-1:batch", price_prompt=5e-7, price_completion=1e-6),
+            model_row(date=d),
+            model_row(date=d, model_id="a/m-1:free", price_prompt=0.0, price_completion=0.0),
+        ]
+        entries += variants if d != "2026-07-30" else variants[::-1]
+    dim = build(_staging(models=entries, usage=usage_rows()))["dim_model"]
+    assert len(dim) == 1, "variant entries must not open versions of their own"
+    assert dim.iloc[0].price_prompt == 1e-6 and dim.iloc[0].price_completion == 2e-6
+    assert dim.iloc[0].model_id == "a/m-1"
+
+
+def test_a_model_listed_only_as_a_variant_keeps_its_entry(fixture_snapshot):
+    staging = _staging(
+        models=[model_row(model_id="a/m-1:free", price_prompt=0.0, price_completion=0.0)],
+        usage=usage_rows(),
+    )
+    dim = build(staging)["dim_model"]
+    assert len(dim) == 1 and dim.iloc[0].model_id == "a/m-1:free"
+
+
 # --- stability -------------------------------------------------------------
 
 

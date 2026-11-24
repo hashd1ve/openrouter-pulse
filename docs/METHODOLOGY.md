@@ -47,6 +47,31 @@ Three consequences run through the whole project:
 A quality check now enforces `day ≤ week ≤ month` on every build. It's a semantic
 invariant, not a schema check, and it would have caught this in an afternoon.
 
+**The day window became rolling on 2026-11-21.** Until 2026-11-20 the three views
+closed at the same midnight. From 2026-11-21, `view=day` is a trailing 24 hours
+stamped by the hour and closing at the latest one (`2026-11-24 18:00:00` in a
+capture taken at 19:00), while `week` and `month` still close at midnight, a day
+or two earlier. The day now covers hours the week does not, so a model that surges
+in them has `day > week`. Seven did on the first day, a model launched on 2026-11-20
+among them.
+
+The check fired on every build from 2026-11-21, which is what it is for, but the
+workflow only committed a capture after validation passed, so the captures of
+21–24 November were lost with the runner. The workflow now commits the raw
+snapshot before anything can reject it.
+
+The fix keeps the invariant where it still holds. Staging carries the full
+`date` stamp (`source_last_activity_ts`); the latest stamp in a window is when it
+closes. A pair of windows is compared only on captures where the shorter one
+closes no later than the longer one: `week ≤ month` everywhere, `day ≤ week` up
+to 2026-11-20. The contract test pins the new semantics: week and month must
+close together and the day with them or after them. A third change fails it.
+
+Momentum (§4) divides the day by the age-corrected month average. Since
+2026-11-21 its numerator is up to two days fresher than its denominator, which
+makes a launch or a surge show up a day earlier and has no effect on a model
+whose traffic is steady.
+
 ## 3. The workload fingerprint
 
 ```
@@ -162,6 +187,20 @@ traffic. Calling it `revenue` anywhere would invite readers to forget that.
 Models without a published price are excluded, not zeroed. An unknown price
 isn't zero, and 144 of 497 model-variants would otherwise drag the total down
 silently.
+
+**Which price.** The catalogue lists a model once per variant (`x`, `x:batch`,
+`x:free`, `x:thinking`), every entry under the same canonical slug: 96 slugs in
+the 2026-11-20 capture. The headline price is the bare entry's; a model listed
+only as a variant takes its lowest id. Until 2026-11-24 `dim_model` keyed on the
+slug alone and took whichever entry the database met first, which was often the
+half-price batch entry or the free one. Two builds of the same archive then
+disagreed: four builds of the archive up to 2026-11-20 gave $331.1 M, $333.9 M,
+$334.7 M and $338.4 M a month of implied value, against $494.6 M with the list
+price, and put the largest lab at about 34% of it, against 40.8%. Every value figure published before
+that date (implied value, concentration by money, the value side of §8 and the
+elasticities of §10) was understated and is superseded by the current
+`FINDINGS.md`. A test now builds a catalogue whose variant entries arrive in a
+different order on each capture and asserts one version at the list price.
 
 ### Blended versus sticker
 
@@ -292,7 +331,10 @@ make dashboard  # docs/dashboard.html
 
 Every published number is read from `data/marts/*.parquet`, derived from
 `data/raw/` by committed SQL. Nothing in `FINDINGS.md` is typed by hand, and CI
-fails if the committed report drifts from what the data produces.
+fails if the committed report drifts from what the data produces. That check only
+proves anything if a build is deterministic; until 2026-11-24 it was not (§7,
+"Which price"), and CI had last run on 2026-07-31, because the daily capture
+pushes with the workflow token and such pushes start no workflows.
 
 ## 14. Design decisions
 

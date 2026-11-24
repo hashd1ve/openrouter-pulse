@@ -20,9 +20,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
           cache: pip
@@ -36,6 +36,23 @@ jobs:
             public-data research; daily single capture)
         run: python -m orpulse.cli ingest
 
+      # Committed before anything downstream can reject it. Until 2026-11-24 the
+      # day was committed only after validation passed, so when OpenRouter changed
+      # the day window on 2026-11-21 the checks failed and the captures of
+      # 21-24 November were thrown away with the runner. A red build is fixable
+      # later; a capture that was never stored is not.
+      - name: Commit the raw snapshot
+        run: |
+          git config user.name  "orpulse-bot"
+          git config user.email "actions@github.com"
+          git add data/raw
+          if git diff --staged --quiet; then
+            echo "no new raw data; not committing"
+          else
+            git commit -m "capture: $(date -u +%Y-%m-%d) (raw)"
+            git push
+          fi
+
       - name: Rebuild marts and validate
         run: python -m orpulse.cli build
 
@@ -44,10 +61,8 @@ jobs:
           python -m orpulse.cli report
           python -m orpulse.cli dashboard
 
-      - name: Commit the day
+      - name: Commit the marts and pages
         run: |
-          git config user.name  "orpulse-bot"
-          git config user.email "actions@github.com"
           git add data/raw data/marts docs/FINDINGS.md docs/dashboard.html
           if git diff --staged --quiet; then
             echo "nothing changed; not committing"
@@ -60,7 +75,7 @@ jobs:
       # rather than a silent gap.
       - name: Upload manifests
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: manifests-${{ github.run_id }}
           path: data/raw/**/_manifest.json

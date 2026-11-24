@@ -238,3 +238,25 @@ def test_weighted_r_squared_is_high_when_the_fit_really_is_good():
     q = 100 * p ** (-1.5)
     w = np.linspace(1, 1000, 100)
     assert log_log_elasticity(p, q, weights=w).r_squared == pytest.approx(1.0, abs=1e-9)
+
+
+# --- the elasticity narrative follows the data ------------------------------
+
+
+def _ci(low, high):
+    import types
+    return types.SimpleNamespace(ci_low=low, ci_high=high)
+
+
+def test_reversal_needs_models_indifferent_and_volume_sensitive():
+    from orpulse import report
+    assert report.reversal(_ci(-0.9, 0.2), _ci(-0.8, -0.3))
+    assert not report.reversal(_ci(-0.8, -0.1), _ci(-0.6, -0.1))   # both clear
+    assert not report.reversal(_ci(-0.5, 0.3), _ci(-0.4, 0.1))     # neither clears
+
+
+def test_clears_zero_phrase_names_what_the_capture_shows():
+    from orpulse import report
+    assert report._clears_zero_phrase(_ci(-0.8, -0.1), _ci(-0.6, -0.1)) == "both clear zero"
+    assert report._clears_zero_phrase(_ci(-0.5, 0.3), _ci(-0.4, 0.1)) == "neither clears zero"
+    assert report._clears_zero_phrase(_ci(-0.8, -0.1), _ci(-0.4, 0.1)) == "only the unweighted one clears zero"

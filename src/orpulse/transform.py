@@ -105,6 +105,10 @@ def stage_model_usage(snapshot_date: str) -> pd.DataFrame:
                     "requests": r.get("count") or 0,
                     # NOT a time index: this is the model's last day with traffic.
                     "source_last_activity_date": (r.get("date") or "")[:10] or None,
+                    # The same stamp at full precision. Since 2026-11-21 the day
+                    # window is rolling and stamps hours, so the latest stamp in a
+                    # window is when that window closes (quality.check_nested_windows).
+                    "source_last_activity_ts": r.get("date") or None,
                     "source_change": r.get("change"),
                     **{f: r.get(f) or 0 for f in _DORMANT_FIELDS},
                 }
@@ -266,7 +270,8 @@ _EMPTY_COLUMNS = {
     ],
     "stg_model_usage": [
         "snapshot_date", "usage_window", "model_permaslug", "variant", "prompt_tokens",
-        "completion_tokens", "requests", "source_last_activity_date", "source_change",
+        "completion_tokens", "requests", "source_last_activity_date",
+        "source_last_activity_ts", "source_change",
         *_DORMANT_FIELDS,
     ],
     "stg_endpoint_perf": [
