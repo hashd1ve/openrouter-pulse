@@ -14,6 +14,7 @@ from __future__ import annotations
 import html
 import math
 from dataclasses import dataclass
+from datetime import date
 
 
 def esc(text) -> str:
@@ -370,4 +371,71 @@ def hbar(rows, *, value_fmt=lambda v: f"{v:.1%}", label="", w=860, row_h=30,
             f'<text x="{pad[3] + bw + 10:.1f}" y="{cy + 4:.1f}" '
             f'class="row-value">{esc(value_fmt(r["value"]))}</text>'
         )
+    return _svg(w, h, "".join(body), label)
+
+
+def bump(series, dates, *, max_rank, label="", w=860, row_px=24, label_w=250):
+    """Rank over time: one line per model, rank 1 at the top.
+
+    `series` is a list of {"name", "ranks": {date: rank}, "highlight": bool}.
+    A model that falls out of the top `max_rank` breaks its line rather than
+    being drawn to an invented position. Lines are labelled at their right end
+    instead of through a legend: with a dozen of them, colour cannot carry the
+    identity, so only the highlighted ones get the series hue.
+    """
+    if len(dates) < 2 or not series:
+        return '<p class="empty">Ranks over time appear from the second capture.</p>'
+    pad = (16, label_w, 40, 44)
+    h = pad[0] + pad[2] + row_px * (max_rank - 1)
+    # Positioned by calendar day, so a missed capture shows as a gap rather
+    # than two days drawn as if they were consecutive.
+    day0 = date.fromisoformat(str(dates[0])[:10])
+    offset = [(date.fromisoformat(str(d)[:10]) - day0).days for d in dates]
+    x = Scale(0, max(offset[-1], 1), pad[3], w - pad[1])
+    y = Scale(1, max_rank, pad[0], h - pad[2])
+
+    body = []
+    for r in sorted({1, *range(5, max_rank + 1, 5)}):
+        py = y.px(r)
+        body.append(
+            f'<line x1="{pad[3]}" y1="{py:.1f}" x2="{w - pad[1]}" y2="{py:.1f}" class="grid"/>'
+            f'<text x="{pad[3] - 8}" y="{py + 4:.1f}" class="tick" text-anchor="end">#{r}</text>'
+        )
+    step = max(1, math.ceil(len(dates) / 7))
+    shown = set(range(0, len(dates), step)) | {len(dates) - 1}
+    for i in sorted(shown):
+        body.append(
+            f'<text x="{x.px(offset[i]):.1f}" y="{h - pad[2] + 18}" class="tick" '
+            f'text-anchor="middle">{esc(str(dates[i])[5:])}</text>'
+        )
+    body.append(
+        f'<text x="{(pad[3] + w - pad[1]) / 2:.0f}" y="{h - 4}" class="axis-title" '
+        f'text-anchor="middle">capture date</text>'
+    )
+
+    # Neutral lines first, highlighted ones on top.
+    for s in sorted(series, key=lambda s: bool(s.get("highlight"))):
+        cls = "bump hl" if s.get("highlight") else "bump"
+        segment, segments = [], []
+        for i, d in enumerate(dates):
+            rank = s["ranks"].get(d)
+            if rank is not None and rank <= max_rank:
+                segment.append((x.px(offset[i]), y.px(rank)))
+            elif segment:
+                segments.append(segment)
+                segment = []
+        if segment:
+            segments.append(segment)
+        for seg in segments:
+            if len(seg) > 1:
+                pts = " ".join(f"{px:.1f},{py:.1f}" for px, py in seg)
+                body.append(f'<polyline points="{pts}" class="{cls}"/>')
+            for px, py in seg:
+                body.append(f'<circle cx="{px:.1f}" cy="{py:.1f}" r="3" class="{cls}-dot"/>')
+        last = s["ranks"].get(dates[-1])
+        if last is not None and last <= max_rank:
+            body.append(
+                f'<text x="{w - pad[1] + 10}" y="{y.px(last) + 4:.1f}" class="row-label">'
+                f'#{last} {esc(s["name"])}</text>'
+            )
     return _svg(w, h, "".join(body), label)

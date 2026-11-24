@@ -54,18 +54,28 @@ The same model varies 14× in price between providers. Median p99/p50 latency is
 **Free tiers substitute.** Where both tiers exist, 81% of tokens never bill, and
 free interactions run larger than paid ones. A funnel would look the opposite.
 
+## Hugging Face trending
+
+Since 2026-11-24 the same daily capture also records the Hugging Face Hub's
+trending list: the top 100 models by the Hub's `trendingScore`, from its
+documented `/api/models` endpoint. The Hub, like OpenRouter, only ever shows
+today's list, so this archive is the only history of it. The dashboard tracks
+each model's rank over time, how long it stays on the list, and whether
+OpenRouter serves it, matched through the catalogue's `hugging_face_id`
+([Methodology §15](docs/METHODOLOGY.md#15-hugging-face-trending)).
+
 ## Running it
 
 ```bash
 pip install -e ".[dev]"
 
-make ingest     # one snapshot: ~2 min, ~8 MB, 365 requests at 4/s
+make ingest     # one snapshot: ~2 min, ~8 MB, ~480 requests at 4/s, plus 1 to Hugging Face
 make build      # staging, SQL marts, statistical marts, quality checks
 make report     # docs/FINDINGS.md
 make dashboard  # docs/dashboard.html
 
-make test       # 142 tests, no network
-make contract   # 10 more against the live API
+make test       # 169 tests, no network
+make contract   # 13 more against the live APIs
 ```
 
 No API key, database, secrets, or plotting library. `git clone && make build`

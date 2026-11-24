@@ -115,3 +115,34 @@ def test_manifest_records_provenance(temp_raw):
     assert manifest.user_agent
     assert manifest.duration_seconds is not None
     assert manifest.files
+
+
+# --- Hugging Face trending -------------------------------------------------
+
+
+class StubHub:
+    def __init__(self, fails=False):
+        self.fails = fails
+
+    def trending_models(self, limit=100):
+        if self.fails:
+            return FetchResult("/api/models", False, 503, 0, 1.0, error="unavailable")
+        return FetchResult("/api/models", True, 200, 10, 1.0, body=load_fixture("hf_trending"))
+
+
+def test_trending_list_is_stored_with_the_snapshot(temp_raw):
+    manifest = ingest.run(StubClient(), now=NOW, hub=StubHub())
+    assert (temp_raw / "2026-07-31" / "hf_trending.json.gz").exists()
+    assert "hf_trending" in manifest.files
+
+
+def test_trending_failure_is_recorded_but_not_fatal(temp_raw):
+    manifest = ingest.run(StubClient(), now=NOW, hub=StubHub(fails=True))
+    assert manifest.complete
+    assert any(f["label"] == "hf_trending" for f in manifest.failures)
+    assert not (temp_raw / "2026-07-31" / "hf_trending.json.gz").exists()
+
+
+def test_a_stub_client_never_reaches_the_real_hub(temp_raw):
+    manifest = ingest.run(StubClient(), now=NOW)
+    assert "hf_trending" not in manifest.files

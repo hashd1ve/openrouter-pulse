@@ -73,5 +73,37 @@ def test_missing_files_yield_empty_frames(tmp_path, monkeypatch):
 
 def test_staging_rebuilds_from_all_snapshots(fixture_snapshot):
     staging = transform.build_staging([fixture_snapshot])
-    assert set(staging) == {"stg_models", "stg_model_usage", "stg_endpoint_perf", "stg_apps"}
+    assert set(staging) == {"stg_models", "stg_model_usage", "stg_endpoint_perf", "stg_apps",
+                            "stg_hf_trending"}
     assert not staging["stg_model_usage"].empty
+
+
+# --- Hugging Face trending -------------------------------------------------
+
+
+def test_hf_trending_is_ranked_by_score_with_a_stable_tie_break(fixture_snapshot):
+    df = transform.stage_hf_trending(fixture_snapshot)
+    assert list(df["hf_model_id"]) == [
+        "deepseek-ai/deepseek-v4-flash",
+        "example/voice-model",            # 640.0, ties with the GGUF; id decides
+        "unsloth/DeepSeek-V4-Flash-GGUF",
+        "example/no-score",               # no score sorts last, not first
+    ]
+    assert list(df["rank"]) == [1, 2, 3, 4]
+
+
+def test_hf_trending_normalises_gating_and_size(fixture_snapshot):
+    df = transform.stage_hf_trending(fixture_snapshot).set_index("hf_model_id")
+    assert df.loc["example/voice-model", "gated"]
+    assert not df.loc["deepseek-ai/deepseek-v4-flash", "gated"]
+    assert df.loc["deepseek-ai/deepseek-v4-flash", "params_total"] == 284_000_000_000
+    assert df.loc["deepseek-ai/deepseek-v4-flash", "downloads_30d"] == 350_000
+
+
+def test_a_day_without_hf_data_stages_nothing():
+    assert transform.stage_hf_trending("1999-01-01").empty
+
+
+def test_models_carry_their_hugging_face_repo(fixture_snapshot):
+    df = transform.stage_models(fixture_snapshot).set_index("model_permaslug")
+    assert df.loc["deepseek/deepseek-v4-flash-20260423", "hugging_face_id"] == "deepseek-ai/DeepSeek-V4-Flash"

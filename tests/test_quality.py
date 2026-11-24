@@ -245,3 +245,33 @@ def test_enforce_raises_only_on_blocking_failures():
 def test_missing_usage_mart_is_blocking():
     results = quality.run_all({"fct_model_usage_snapshot": pd.DataFrame()})
     assert results[0].blocking
+
+
+# --- Hugging Face trending -------------------------------------------------
+
+
+def trending_df(date, n):
+    return pd.DataFrame({"snapshot_date": [date] * n, "rank": range(1, n + 1),
+                         "hf_model_id": [f"a/m-{i}" for i in range(n)]})
+
+
+def test_hf_check_warns_but_never_blocks_when_absent():
+    result = quality.check_hf_trending(pd.DataFrame(), usage_df(nested_ok()))
+    assert not result.passed and not result.blocking
+
+
+def test_hf_check_warns_when_the_latest_capture_missed_it():
+    usage = usage_df(nested_ok(date="2026-11-25"))
+    result = quality.check_hf_trending(trending_df("2026-11-24", 100), usage)
+    assert not result.passed and "2026-11-25" in result.detail
+
+
+def test_hf_check_warns_on_a_partial_list():
+    usage = usage_df(nested_ok(date="2026-11-24"))
+    result = quality.check_hf_trending(trending_df("2026-11-24", 12), usage)
+    assert not result.passed and "12 models" in result.detail
+
+
+def test_hf_check_passes_on_a_full_list():
+    usage = usage_df(nested_ok(date="2026-11-24"))
+    assert quality.check_hf_trending(trending_df("2026-11-24", 100), usage).passed

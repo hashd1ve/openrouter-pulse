@@ -1,0 +1,44 @@
+[
+ {
+  "_id": "1",
+  "id": "deepseek-ai/deepseek-v4-flash",
+  "trendingScore": 812.5,
+  "likes": 4100,
+  "downloads": 350000,
+  "pipeline_tag": "text-generation",
+  "library_name": "transformers",
+  "createdAt": "2026-04-20T10:00:00.000Z",
+  "lastModified": "2026-07-01T00:00:00.000Z",
+  "safetensors": {
+   "total": 284000000000
+  },
+  "gated": false
+ },
+ {
+  "_id": "2",
+  "id": "unsloth/DeepSeek-V4-Flash-GGUF",
+  "trendingScore": 640.0,
+  "likes": 900,
+  "downloads": 1200000,
+  "pipeline_tag": "text-generation",
+  "library_name": "gguf",
+  "createdAt": "2026-04-22T10:00:00.000Z",
+  "gated": false
+ },
+ {
+  "_id": "3",
+  "id": "example/voice-model",
+  "trendingScore": 640.0,
+  "likes": 300,
+  "downloads": 5000,
+  "pipeline_tag": "audio-to-audio",
+  "createdAt": "2026-07-25T00:00:00.000Z",
+  "gated": "manual"
+ },
+ {
+  "_id": "4",
+  "id": "example/no-score",
+  "likes": 1,
+  "downloads": 2
+ }
+]

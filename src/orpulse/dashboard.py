@@ -101,6 +101,10 @@ figcaption{font-size:13.5px;color:var(--muted);margin-top:10px;max-width:70ch}
 .band{fill:var(--s1);fill-opacity:.14}
 .censor{stroke:var(--s1);stroke-width:1.5;stroke-opacity:.75}
 .empty{color:var(--muted);font-style:italic}
+.bump{fill:none;stroke:var(--neutral);stroke-width:1.75;stroke-opacity:.6;stroke-linejoin:round}
+.bump.hl{stroke:var(--s1);stroke-opacity:1;stroke-width:2.5}
+.bump-dot{fill:var(--neutral)}
+.bump.hl-dot{fill:var(--s1)}
 
 .legend{display:flex;flex-wrap:wrap;gap:14px;margin:12px 0 0;
   font-size:13px;color:var(--muted)}
@@ -573,6 +577,101 @@ free trials graduating into heavy paid usage. This looks like substitution.</p>
 """
 
 
+def _short(name: str, limit: int = 34) -> str:
+    return name if len(name) <= limit else name[: limit - 1] + "…"
+
+
+def _days_between(start, end) -> int | None:
+    try:
+        a, b = pd.Timestamp(start), pd.Timestamp(end)
+    except (TypeError, ValueError):
+        return None
+    if pd.isna(a) or pd.isna(b):
+        return None
+    if a.tzinfo is not None:
+        a = a.tz_convert(None)
+    return (b - a).days
+
+
+def _hf_trending(marts):
+    snap = marts.get("fct_hf_trending_snapshot", pd.DataFrame())
+    mart = marts.get("mart_hf_trending", pd.DataFrame())
+    head = "<h2>8 · What's trending on Hugging Face</h2>"
+    if snap.empty or mart.empty:
+        return head + ('<p class="empty">No Hugging Face capture yet. The daily job '
+                       'records the trending list from 2026-11-24 on.</p>')
+
+    dates = sorted(snap["snapshot_date"].astype(str).unique())
+    latest_date = dates[-1]
+    cur = mart[mart["current_rank"].notna()].sort_values("current_rank")
+    served = cur["on_openrouter_now"].fillna(False).astype(bool)
+    top20 = cur.head(20)
+    ages = [d for d in (_days_between(t, latest_date) for t in top20["created_ts"]) if d is not None]
+    median_age = f"{int(np.median(ages))} d" if ages else "—"
+
+    # Rank over time for today's top twelve, over the last 30 captures.
+    window = dates[-30:]
+    in_window = snap[snap["snapshot_date"].astype(str).isin(window)]
+    series = []
+    for r in cur.head(12).itertuples():
+        ranks = {str(d): int(k) for d, k in in_window.loc[
+            in_window["hf_model_id"] == r.hf_model_id, ["snapshot_date", "rank"]
+        ].itertuples(index=False)}
+        series.append({"name": _short(r.hf_model_id), "ranks": ranks,
+                       "highlight": int(r.current_rank) <= 3})
+    chart = charts.bump(series, window, max_rank=20,
+                        label="Rank of today's top twelve Hugging Face trending models over time")
+
+    def change(r):
+        if bool(r.is_new_entry):
+            return "new"
+        if pd.isna(r.rank_change):
+            return "—"
+        k = int(r.rank_change)
+        return "—" if k == 0 else (f"+{k}" if k > 0 else f"−{-k}")
+
+    table = cur.head(25).assign(
+        rank_s=lambda d: d["current_rank"].astype(int).map(lambda v: f"#{v}"),
+        change_s=[change(r) for r in cur.head(25).itertuples()],
+        # Plain text, not links: the page references no external host at all.
+        model_s=lambda d: d["hf_model_id"].map(lambda m: f"<code>{esc(_short(m, 44))}</code>"),
+        task_s=lambda d: d["pipeline_tag"].fillna("—").map(esc),
+        params_s=lambda d: d["params_total"].map(lambda v: fmt_compact(float(v)) if pd.notna(v) else "—"),
+        likes_s=lambda d: d["likes"].map(lambda v: f"{int(v):,}" if pd.notna(v) else "—"),
+        dl_s=lambda d: d["downloads_30d"].map(lambda v: fmt_compact(float(v)) if pd.notna(v) else "—"),
+        days_s=lambda d: d["captures_trending"].astype(int).map(str),
+        or_s=lambda d: d["on_openrouter_now"].fillna(False).astype(bool).map(lambda b: "yes" if b else ""),
+    )
+    return f"""
+{head}
+<p>The Hub publishes its trending list the way OpenRouter publishes rankings:
+today's, and nothing else. The daily capture keeps the top
+{len(snap[snap["snapshot_date"].astype(str) == latest_date])} by the Hub's
+<code>trendingScore</code>, so this series, like the other one, starts on the day
+of the first capture, {esc(dates[0])}.</p>
+<div class="tiles">
+  {_tile(f"{len(dates)}", "daily captures")}
+  {_tile(f"{len(mart):,}", "models seen on the list")}
+  {_tile(f"{int(served.sum())} of {len(cur)}", "on today's list, served on OpenRouter")}
+  {_tile(median_age, "median age of today's top 20")}
+</div>
+<figure>
+  <div class="scroll">{chart}</div>
+  {_legend([("s1", "today's top three"), (NEUTRAL, "ranks 4–12")])}
+  <figcaption>Rank on each capture, #1 at the top; a line breaks where the model
+  was outside the top 20. Labels give today's rank.</figcaption>
+</figure>
+{_table(table, [("rank_s", "Rank"), ("change_s", "Since last"), ("model_s", "Model"),
+                ("task_s", "Task"), ("params_s", "Params"), ("likes_s", "Likes"),
+                ("dl_s", "Downloads 30 d"), ("days_s", "Days on list"),
+                ("or_s", "On OpenRouter")],
+        numeric={"params_s", "likes_s", "dl_s", "days_s"})}
+<p><small>"On OpenRouter" matches the catalogue's <code>hugging_face_id</code>
+to the repo. Quantised and fine-tuned repos (<code>-GGUF</code>, <code>-MLX</code>)
+carry their own ids and never match; OpenRouter serves the base model.</small></p>
+"""
+
+
 def _health(marts):
     results = quality.run_all(marts)
     def card(r):
@@ -598,7 +697,7 @@ def _health(marts):
                     f"<td class='num'>{m['bytes_received'] / 1e6:.1f} MB</td>"
                     f"<td class='num'>{m.get('duration_seconds', 0):.0f}s</td></tr>")
     return f"""
-<h2>8 · The pipeline's own vitals</h2>
+<h2>9 · The pipeline's own vitals</h2>
 <p>A dashboard that cannot say whether its data is current is a liability.</p>
 <div class="checks">{cards}</div>
 <details><summary>Capture manifests — every gap in the series has a recorded cause</summary>
@@ -624,6 +723,9 @@ aggregate.</li>
 <li><strong>Four schema fields are dormant</strong> — cache, reasoning and
 tool-call counters are present but zero for every model. Nothing is built on
 them; a contract test watches for them waking up.</li>
+<li><strong>Trending is the Hub's own score</strong>, a recent-likes-and-downloads
+blend it does not document. The capture keeps the top 100 a day; a model's
+trajectory below that is not observed.</li>
 <li><strong>Traffic is not users.</strong> One agentic application can outproduce a
 million chat sessions. Nothing here measures adoption or satisfaction.</li>
 <li><strong>Archetype cuts are frozen, not re-fitted.</strong> Boundary models
@@ -665,6 +767,7 @@ def content(marts: dict[str, pd.DataFrame]) -> str:
         _elasticity(latest("mart_price_elasticity")),
         _survival(latest("mart_model_survival"), latest("mart_survival_sensitivity")),
         _variants(latest("mart_variant_economics")),
+        _hf_trending(marts),
         _health(marts),
         _limits(),
         f"""<hr><p><small>Snapshot <code>{esc(snapshot)}</code>. Every figure on this
