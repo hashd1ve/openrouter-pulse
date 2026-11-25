@@ -24,6 +24,18 @@ REQUESTS_PER_SECOND = float(os.environ.get("ORPULSE_RPS", "4"))
 MAX_RETRIES = int(os.environ.get("ORPULSE_MAX_RETRIES", "4"))
 TIMEOUT_SECONDS = float(os.environ.get("ORPULSE_TIMEOUT", "30"))
 
+# --- Hugging Face trending ------------------------------------------------
+# The documented /api/models endpoint sorted by trendingScore. Like OpenRouter's
+# rankings it has no history: it returns today's list, so the daily capture is
+# the only series of it. One request a day.
+HF_BASE_URL = os.environ.get("ORPULSE_HF_BASE_URL", "https://huggingface.co")
+HF_TRENDING_LIMIT = int(os.environ.get("ORPULSE_HF_TRENDING_LIMIT", "100"))
+HF_TRENDING_FIELDS = (
+    "trendingScore", "likes", "downloads", "pipeline_tag", "library_name",
+    "createdAt", "lastModified", "safetensors", "gated",
+)
+MIN_HF_TRENDING_ROWS = 50          # fewer means a partial response
+
 # Each window returns one row per (model, variant) over a trailing period.
 # It is not a daily series -- see METHODOLOGY §2.
 WINDOWS = ("day", "week", "month")

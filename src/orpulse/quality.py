@@ -233,6 +233,33 @@ def check_archetype_stability(stability: pd.DataFrame) -> CheckResult:
     )
 
 
+def check_hf_trending(trending: pd.DataFrame, usage: pd.DataFrame) -> CheckResult:
+    """The Hugging Face list arrived whole on the latest capture.
+
+    WARN, not ERROR: it is a best-effort source next to OpenRouter's, and a day
+    without it should not cost the day's OpenRouter data. It still says so, since
+    a missed day of trending is as unrecoverable as a missed day of rankings.
+    """
+    name = "hf_trending_captured"
+    if trending.empty:
+        return CheckResult(name, False, WARN, "no Hugging Face trending capture in the archive")
+    latest_usage = str(usage["snapshot_date"].max()) if not usage.empty else None
+    latest = str(trending["snapshot_date"].max())
+    rows = int((trending["snapshot_date"].astype(str) == latest).sum())
+    days = trending["snapshot_date"].nunique()
+    if latest_usage and latest != latest_usage:
+        return CheckResult(
+            name, False, WARN,
+            f"latest trending capture is {latest}, latest OpenRouter capture {latest_usage}",
+        )
+    if rows < config.MIN_HF_TRENDING_ROWS:
+        return CheckResult(
+            name, False, WARN,
+            f"{rows} models on {latest}, fewer than {config.MIN_HF_TRENDING_ROWS}",
+        )
+    return CheckResult(name, True, WARN, f"{rows} models on {latest}; {days} capture(s) since {trending['snapshot_date'].min()}")
+
+
 # --- runner ----------------------------------------------------------------
 
 
@@ -240,6 +267,7 @@ def run_all(marts: dict[str, pd.DataFrame], *, now: datetime | None = None) -> l
     usage = marts.get("fct_model_usage_snapshot", pd.DataFrame())
     fingerprint = marts.get("mart_model_fingerprint", pd.DataFrame())
     stability = marts.get("mart_archetype_stability", pd.DataFrame())
+    trending = marts.get("fct_hf_trending_snapshot", pd.DataFrame())
 
     if usage.empty:
         return [CheckResult("usage_present", False, ERROR, "fct_model_usage_snapshot is empty")]
@@ -253,6 +281,7 @@ def run_all(marts: dict[str, pd.DataFrame], *, now: datetime | None = None) -> l
         check_freshness(usage, now=now),
         check_fingerprint_coverage(fingerprint),
         check_archetype_stability(stability),
+        check_hf_trending(trending, usage),
     ]
     for r in results:
         log.log(logging.ERROR if r.blocking else logging.INFO, "%s", r)

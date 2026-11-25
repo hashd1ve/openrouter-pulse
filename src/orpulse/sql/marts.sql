@@ -84,7 +84,8 @@ collapsed AS (
         arg_max(output_modalities, snapshot_date)   AS output_modalities,
         arg_max(tokenizer,         snapshot_date)   AS tokenizer,
         arg_max(supports_tools,    snapshot_date)   AS supports_tools,
-        arg_max(supports_reasoning, snapshot_date)  AS supports_reasoning
+        arg_max(supports_reasoning, snapshot_date)  AS supports_reasoning,
+        arg_max(hugging_face_id,   snapshot_date)   AS hugging_face_id
     FROM versioned
     GROUP BY model_permaslug, version_num
 )
@@ -650,3 +651,98 @@ SELECT
 FROM by_variant
 WHERE n_variants > 1
 ORDER BY snapshot_date, model_permaslug;
+
+
+-- ---------------------------------------------------------------------
+-- fct_hf_trending_snapshot — grain: (snapshot_date, hf_model_id)
+--
+-- The Hugging Face Hub's trending list as captured that day: the top
+-- HF_TRENDING_LIMIT models by trendingScore. Like the rankings feed it has no
+-- history, so the series starts at the first capture (2026-11-24).
+-- ---------------------------------------------------------------------
+CREATE OR REPLACE TABLE fct_hf_trending_snapshot AS
+SELECT
+    snapshot_date,
+    CAST(rank AS INTEGER)            AS rank,
+    CAST(hf_model_id AS VARCHAR)     AS hf_model_id,
+    CAST(author AS VARCHAR)          AS author,
+    CAST(trending_score AS DOUBLE)   AS trending_score,
+    CAST(likes AS BIGINT)            AS likes,
+    CAST(downloads_30d AS BIGINT)    AS downloads_30d,
+    CAST(pipeline_tag AS VARCHAR)    AS pipeline_tag,
+    CAST(library_name AS VARCHAR)    AS library_name,
+    CAST(created_ts AS VARCHAR)      AS created_ts,
+    CAST(params_total AS BIGINT)     AS params_total,
+    CAST(gated AS BOOLEAN)           AS gated
+FROM stg_hf_trending
+WHERE hf_model_id IS NOT NULL;
+
+
+-- ---------------------------------------------------------------------
+-- mart_hf_trending — one row per model that has ever trended.
+--
+-- rank_change is previous capture minus latest, so positive means it climbed.
+-- The OpenRouter join goes through the catalogue's `hugging_face_id`, compared
+-- case-insensitively; quantised and fine-tuned repos (`-GGUF`, `-MLX`) carry
+-- their own ids and never match, which is correct: OpenRouter serves the base.
+-- ---------------------------------------------------------------------
+CREATE OR REPLACE TABLE mart_hf_trending AS
+WITH captures AS (
+    SELECT snapshot_date,
+           row_number() OVER (ORDER BY snapshot_date DESC) AS recency
+    FROM (SELECT DISTINCT snapshot_date FROM fct_hf_trending_snapshot)
+),
+latest   AS (SELECT snapshot_date FROM captures WHERE recency = 1),
+previous AS (SELECT snapshot_date FROM captures WHERE recency = 2),
+per_model AS (
+    SELECT
+        hf_model_id,
+        min(snapshot_date)                         AS first_trending,
+        max(snapshot_date)                         AS last_trending,
+        count(*)                                   AS captures_trending,
+        min(rank)                                  AS best_rank,
+        max(trending_score)                        AS peak_trending_score,
+        arg_max(author,        snapshot_date)      AS author,
+        arg_max(pipeline_tag,  snapshot_date)      AS pipeline_tag,
+        arg_max(library_name,  snapshot_date)      AS library_name,
+        arg_max(created_ts,    snapshot_date)      AS created_ts,
+        arg_max(params_total,  snapshot_date)      AS params_total,
+        arg_max(likes,         snapshot_date)      AS likes,
+        arg_max(downloads_30d, snapshot_date)      AS downloads_30d,
+        arg_max(gated,         snapshot_date)      AS gated
+    FROM fct_hf_trending_snapshot
+    GROUP BY hf_model_id
+),
+openrouter AS (
+    SELECT
+        lower(CAST(hugging_face_id AS VARCHAR))    AS hf_key,
+        min(snapshot_date)                         AS first_listed_on_openrouter,
+        max(snapshot_date)                         AS last_listed_on_openrouter
+    FROM stg_models
+    WHERE hugging_face_id IS NOT NULL
+      AND CAST(hugging_face_id AS VARCHAR) <> ''
+    GROUP BY 1
+)
+SELECT
+    p.*,
+    l.rank                                         AS current_rank,
+    l.trending_score                               AS current_trending_score,
+    pr.rank                                        AS previous_rank,
+    pr.rank - l.rank                               AS rank_change,
+    (SELECT count(*) FROM previous) > 0
+        AND l.rank IS NOT NULL AND pr.rank IS NULL AS is_new_entry,
+    o.first_listed_on_openrouter,
+    o.hf_key IS NOT NULL                           AS ever_on_openrouter,
+    coalesce(o.last_listed_on_openrouter = (SELECT max(snapshot_date) FROM stg_models), false)
+                                                   AS on_openrouter_now,
+    date_diff('day', CAST(p.first_trending AS DATE),
+              CAST(o.first_listed_on_openrouter AS DATE))
+                                                   AS days_trending_to_openrouter
+FROM per_model p
+LEFT JOIN fct_hf_trending_snapshot l
+       ON l.hf_model_id = p.hf_model_id AND l.snapshot_date = (SELECT snapshot_date FROM latest)
+LEFT JOIN fct_hf_trending_snapshot pr
+       ON pr.hf_model_id = p.hf_model_id AND pr.snapshot_date = (SELECT snapshot_date FROM previous)
+LEFT JOIN openrouter o
+       ON o.hf_key = lower(CAST(p.hf_model_id AS VARCHAR))
+ORDER BY current_rank NULLS LAST, best_rank, p.hf_model_id;

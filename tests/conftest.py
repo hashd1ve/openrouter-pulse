@@ -43,6 +43,7 @@ def fixture_snapshot(tmp_path, monkeypatch):
         "rankings_models_month",
         "endpoint_stats",
         "rankings_apps",
+        "hf_trending",
     ):
         write_gzip_json(snap / f"{name}.json.gz", load_fixture(name))
 

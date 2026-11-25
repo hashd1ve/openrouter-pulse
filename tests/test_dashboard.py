@@ -202,7 +202,7 @@ def test_page_styles_both_colour_schemes(page):
 # Sections that need only a handful of models, and so must always render.
 CORE_SECTIONS = ("The market splits in two", "Attention and money part company",
                  "context window arms race", "serving layer",
-                 "own vitals", "What this cannot tell you")
+                 "trending on Hugging Face", "own vitals", "What this cannot tell you")
 
 
 def test_page_contains_every_core_section(page):
@@ -260,3 +260,32 @@ def test_write_produces_a_file(built_marts, tmp_path):
 def test_missing_marts_raise_rather_than_writing_an_empty_page(tmp_path):
     with pytest.raises(RuntimeError, match="no marts"):
         dashboard.write({}, tmp_path / "x.html")
+
+
+# --- rank over time ----------------------------------------------------------
+
+
+def test_bump_needs_two_captures():
+    out = charts.bump([{"name": "a/x", "ranks": {"2026-11-24": 1}}], ["2026-11-24"], max_rank=10)
+    assert "second capture" in out
+
+
+def test_bump_breaks_a_line_where_the_model_left_the_range():
+    dates = ["2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27"]
+    svg = charts.bump(
+        [{"name": "a/x", "ranks": {"2026-11-24": 1, "2026-11-25": 2,
+                                   "2026-11-26": 40, "2026-11-27": 3}}],
+        dates, max_rank=20,
+    )
+    ET.fromstring(svg)
+    assert svg.count("<polyline") == 1, "one segment for 24-25; 27 stands alone"
+    assert svg.count("<circle") == 3
+
+
+def test_bump_spaces_captures_by_calendar_day():
+    svg = charts.bump(
+        [{"name": "a/x", "ranks": {"2026-11-20": 1, "2026-11-21": 1, "2026-11-30": 1}}],
+        ["2026-11-20", "2026-11-21", "2026-11-30"], max_rank=5,
+    )
+    xs = [float(v) for v in re.findall(r'<circle cx="([0-9.]+)"', svg)]
+    assert (xs[2] - xs[1]) == pytest.approx(9 * (xs[1] - xs[0]), rel=1e-3)

@@ -13,7 +13,7 @@ import pytest
 from orpulse import config, transform
 
 
-def _staging(models=None, usage=None, endpoints=None, apps=None):
+def _staging(models=None, usage=None, endpoints=None, apps=None, trending=None):
     """Build a staging dict with the right columns, filling in blanks."""
     out = {}
     for name, rows in (
@@ -21,6 +21,7 @@ def _staging(models=None, usage=None, endpoints=None, apps=None):
         ("stg_model_usage", usage),
         ("stg_endpoint_perf", endpoints),
         ("stg_apps", apps),
+        ("stg_hf_trending", trending),
     ):
         cols = transform._EMPTY_COLUMNS[name]
         out[name] = (
@@ -304,3 +305,56 @@ def test_low_volume_endpoints_are_excluded_as_noise(fixture_snapshot):
     )
     pp = build(staging)["mart_endpoint_price_perf"]
     assert set(pp.endpoint_id) == {"busy"}
+
+
+# --- Hugging Face trending -------------------------------------------------
+
+
+def trend(model, date, rank, score=100.0):
+    return {"snapshot_date": date, "rank": rank, "hf_model_id": model,
+            "author": model.split("/")[0], "trending_score": score, "likes": 10,
+            "downloads_30d": 1000, "pipeline_tag": "text-generation",
+            "library_name": "transformers", "created_ts": "2026-07-01T00:00:00.000Z",
+            "params_total": None, "gated": False}
+
+
+def hf_mart(trending, models=None):
+    staging = _staging(models=models or [model_row()], usage=usage_rows(), trending=trending)
+    con = transform.build_marts(staging)
+    return con.execute("SELECT * FROM mart_hf_trending").df().set_index("hf_model_id")
+
+
+def test_rank_change_is_positive_when_a_model_climbs(fixture_snapshot):
+    m = hf_mart([trend("a/up", "2026-07-30", 9), trend("a/up", "2026-07-31", 2),
+                 trend("a/down", "2026-07-30", 1), trend("a/down", "2026-07-31", 5)])
+    assert m.loc["a/up", "rank_change"] == 7
+    assert m.loc["a/down", "rank_change"] == -4
+    assert m.loc["a/up", "captures_trending"] == 2 and m.loc["a/up", "best_rank"] == 2
+
+
+def test_new_entries_need_a_previous_capture_to_be_new(fixture_snapshot):
+    one_day = hf_mart([trend("a/x", "2026-07-31", 1)])
+    assert not one_day.loc["a/x", "is_new_entry"], "nothing is new on the first capture"
+    two_days = hf_mart([trend("a/x", "2026-07-30", 1), trend("a/x", "2026-07-31", 2),
+                        trend("a/y", "2026-07-31", 1)])
+    assert two_days.loc["a/y", "is_new_entry"] and not two_days.loc["a/x", "is_new_entry"]
+
+
+def test_a_model_that_left_the_list_has_no_current_rank(fixture_snapshot):
+    m = hf_mart([trend("a/gone", "2026-07-30", 3), trend("a/here", "2026-07-31", 1)])
+    assert m.loc["a/gone"].isna()["current_rank"]
+    assert m.loc["a/gone", "last_trending"] == "2026-07-30"
+
+
+def test_openrouter_match_is_case_insensitive_and_skips_quantised_repos(fixture_snapshot):
+    models = [model_row(hugging_face_id="Org/Model-7B")]
+    m = hf_mart([trend("org/model-7b", "2026-07-31", 1),
+                 trend("someone/Model-7B-GGUF", "2026-07-31", 2)], models=models)
+    assert m.loc["org/model-7b", "on_openrouter_now"]
+    assert m.loc["org/model-7b", "first_listed_on_openrouter"] == "2026-07-31"
+    assert not m.loc["someone/Model-7B-GGUF", "ever_on_openrouter"]
+
+
+def test_marts_build_from_an_archive_with_no_hf_data(fixture_snapshot):
+    con = transform.build_marts(_staging(models=[model_row()], usage=usage_rows()))
+    assert con.execute("SELECT count(*) FROM mart_hf_trending").fetchone()[0] == 0

@@ -19,7 +19,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from . import config
-from .client import FetchResult, OpenRouterClient, write_gzip_json
+from .client import FetchResult, HubClient, OpenRouterClient, write_gzip_json
 
 log = logging.getLogger(__name__)
 
@@ -73,8 +73,15 @@ def run(
     now: datetime | None = None,
     sweep_endpoints: bool = True,
     max_models: int | None = None,
+    hub: HubClient | None = None,
 ) -> RunManifest:
-    """Take a full snapshot. Raises if a load-bearing endpoint is unavailable."""
+    """Take a full snapshot. Raises if a load-bearing endpoint is unavailable.
+
+    `hub` defaults to the real Hugging Face client only alongside the real
+    OpenRouter one, so a run against a stub never reaches the network.
+    """
+    if hub is None and client is None:
+        hub = HubClient()
     client = client or OpenRouterClient()
     now = now or datetime.now(timezone.utc)
     snapshot_date = now.date().isoformat()
@@ -114,6 +121,13 @@ def run(
     manifest.record(providers, "providers")
     if providers.ok:
         store("providers", providers.body)
+
+    if hub is not None:
+        log.info("fetching Hugging Face trending models")
+        trending = hub.trending_models()
+        manifest.record(trending, "hf_trending")
+        if trending.ok:
+            store("hf_trending", trending.body)
 
     if sweep_endpoints:
         slugs = [m["canonical_slug"] for m in models.get("data", []) if m.get("canonical_slug")]

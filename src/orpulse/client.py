@@ -99,7 +99,7 @@ class OpenRouterClient:
 
     # -- core ---------------------------------------------------------------
 
-    def fetch(self, path: str, params: dict[str, str] | None = None) -> FetchResult:
+    def fetch(self, path: str, params=None) -> FetchResult:
         """Fetch one path, never raising. The caller decides what a failure means.
 
         A partial failure (one model 404s) must not abort a 365-request sweep,
@@ -154,7 +154,7 @@ class OpenRouterClient:
             error=last_detail,
         )
 
-    def fetch_or_raise(self, path: str, params: dict[str, str] | None = None) -> Any:
+    def fetch_or_raise(self, path: str, params=None) -> Any:
         """For endpoints whose failure invalidates the whole run."""
         result = self.fetch(path, params)
         if not result.ok:
@@ -189,6 +189,22 @@ class OpenRouterClient:
             "/api/frontend/v1/stats/endpoint",
             {"permaslug": permaslug, "variant": variant},
         )
+
+
+class HubClient(OpenRouterClient):
+    """The same polite client, pointed at the Hugging Face Hub's public API."""
+
+    def __init__(self, base_url: str = config.HF_BASE_URL, **kwargs):
+        super().__init__(base_url, **kwargs)
+
+    def trending_models(self, limit: int = config.HF_TRENDING_LIMIT) -> FetchResult:
+        """Today's trending models, best first. Best-effort: never raises.
+
+        `expand[]` repeats, so the query goes as pairs rather than a dict.
+        """
+        params = [("sort", "trendingScore"), ("direction", "-1"), ("limit", str(limit))]
+        params += [("expand[]", f) for f in config.HF_TRENDING_FIELDS]
+        return self.fetch("/api/models", params)
 
 
 def write_gzip_json(path, payload: Any) -> int:

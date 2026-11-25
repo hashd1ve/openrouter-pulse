@@ -14,7 +14,7 @@ from __future__ import annotations
 import pytest
 
 from orpulse import config
-from orpulse.client import OpenRouterClient
+from orpulse.client import HubClient, OpenRouterClient
 
 pytestmark = pytest.mark.contract
 
@@ -183,4 +183,25 @@ def test_dormant_fields_are_still_dormant(rankings):
     assert not awake, (
         f"fields {sorted(awake)} now carry data -- new analysis is possible, "
         "and docs/METHODOLOGY.md needs updating"
+    )
+
+
+# --- Hugging Face Hub ------------------------------------------------------
+
+
+def test_hf_trending_returns_a_full_ranked_list():
+    result = HubClient().trending_models()
+    assert result.ok, f"Hugging Face trending unavailable: {result.error}"
+    body = result.body
+    assert isinstance(body, list) and len(body) >= config.MIN_HF_TRENDING_ROWS
+    for key in ("id", "trendingScore", "likes", "downloads", "createdAt"):
+        assert key in body[0], f"/api/models lost the `{key}` field under expand[]"
+    scores = [m.get("trendingScore") or 0 for m in body]
+    assert scores == sorted(scores, reverse=True), "the list is no longer sorted by trendingScore"
+
+
+def test_openrouter_still_names_the_hugging_face_repo(client):
+    models = client.models()["data"]
+    assert sum(1 for m in models if m.get("hugging_face_id")) > 50, (
+        "the catalogue stopped carrying hugging_face_id; the trending join goes blind"
     )

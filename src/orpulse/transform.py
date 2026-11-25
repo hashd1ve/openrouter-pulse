@@ -72,6 +72,9 @@ def stage_models(snapshot_date: str) -> pd.DataFrame:
                 "max_completion_tokens": top.get("max_completion_tokens"),
                 "supports_tools": "tools" in (m.get("supported_parameters") or []),
                 "supports_reasoning": "reasoning" in (m.get("supported_parameters") or []),
+                # The weights' repo, when the model has public ones. The join key
+                # to the Hugging Face trending list.
+                "hugging_face_id": m.get("hugging_face_id") or None,
             }
         )
     return pd.DataFrame(rows)
@@ -180,11 +183,50 @@ def stage_apps(snapshot_date: str) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def _gated(value) -> bool | None:
+    """The Hub answers False, "auto" or "manual"; anything but False is gated."""
+    if value is None:
+        return None
+    return value is not False and value != "false"
+
+
+def stage_hf_trending(snapshot_date: str) -> pd.DataFrame:
+    """One row per model in the day's trending list, ranked as the Hub ranks it."""
+    payload = _read(snapshot_date, "hf_trending")
+    if not isinstance(payload, list):
+        return pd.DataFrame()
+    entries = [m for m in payload if isinstance(m, dict) and m.get("id")]
+    # The API returns them best first; sorting again makes the rank independent
+    # of that, with the id as a stable tie-break.
+    entries.sort(key=lambda m: (-(m.get("trendingScore") or 0), m["id"]))
+    rows = []
+    for rank, m in enumerate(entries, 1):
+        rows.append(
+            {
+                "snapshot_date": snapshot_date,
+                "rank": rank,
+                "hf_model_id": m["id"],
+                "author": m["id"].split("/")[0] if "/" in m["id"] else None,
+                "trending_score": m.get("trendingScore"),
+                "likes": m.get("likes"),
+                # The Hub's `downloads` is the trailing 30 days, not all time.
+                "downloads_30d": m.get("downloads"),
+                "pipeline_tag": m.get("pipeline_tag"),
+                "library_name": m.get("library_name"),
+                "created_ts": m.get("createdAt"),
+                "params_total": (m.get("safetensors") or {}).get("total"),
+                "gated": _gated(m.get("gated")),
+            }
+        )
+    return pd.DataFrame(rows)
+
+
 _STAGERS = {
     "stg_models": stage_models,
     "stg_model_usage": stage_model_usage,
     "stg_endpoint_perf": stage_endpoint_perf,
     "stg_apps": stage_apps,
+    "stg_hf_trending": stage_hf_trending,
 }
 
 
@@ -220,8 +262,11 @@ def build_marts(staging: dict[str, pd.DataFrame] | None = None) -> duckdb.DuckDB
     """Run the modelling SQL and persist the marts as Parquet."""
     con = duckdb.connect()
     staging = staging or _load_staging()
-    for name, df in staging.items():
-        con.register(name, df if not df.empty else _empty_like(name))
+    # Every staging table is registered, empty if absent, so the SQL parses
+    # against an archive that predates a source (Hugging Face from 2026-11-24).
+    for name in _STAGERS:
+        df = staging.get(name)
+        con.register(name, df if df is not None and not df.empty else _empty_like(name))
 
     con.execute(f"SET VARIABLE pc_ratio_high = {config.PC_RATIO_HIGH}")
     con.execute(f"SET VARIABLE tpr_high = {config.TPR_HIGH}")
@@ -267,6 +312,7 @@ _EMPTY_COLUMNS = {
         "context_length", "created_ts", "price_prompt", "price_completion",
         "price_cache_read", "input_modalities", "output_modalities", "tokenizer",
         "is_moderated", "max_completion_tokens", "supports_tools", "supports_reasoning",
+        "hugging_face_id",
     ],
     "stg_model_usage": [
         "snapshot_date", "usage_window", "model_permaslug", "variant", "prompt_tokens",
@@ -285,6 +331,11 @@ _EMPTY_COLUMNS = {
     "stg_apps": [
         "snapshot_date", "usage_window", "app_id", "rank", "total_tokens",
         "total_requests", "app_title", "app_origin_url",
+    ],
+    "stg_hf_trending": [
+        "snapshot_date", "rank", "hf_model_id", "author", "trending_score", "likes",
+        "downloads_30d", "pipeline_tag", "library_name", "created_ts", "params_total",
+        "gated",
     ],
 }
 

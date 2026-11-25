@@ -364,3 +364,46 @@ Isolated, a red run there means one thing.
 **No plotting library.** The dashboard is one HTML file with inline SVG. It opens
 anywhere, survives a strict content-security policy, and has no runtime
 dependency to rot.
+
+## 15. Hugging Face trending
+
+From 2026-11-24 each capture also stores the Hub's trending list:
+
+```
+GET https://huggingface.co/api/models?sort=trendingScore&direction=-1&limit=100
+    &expand[]=trendingScore&expand[]=likes&expand[]=downloads&expand[]=pipeline_tag
+    &expand[]=library_name&expand[]=createdAt&expand[]=lastModified
+    &expand[]=safetensors&expand[]=gated
+```
+
+It is the documented endpoint, not the frontend one, and costs one request a
+day. Like the rankings feed it carries no history, so `data/raw/*/hf_trending.json.gz`
+is the only series of it and it starts on the first capture.
+
+What the fields mean:
+
+| Field | Meaning |
+|---|---|
+| `trendingScore` | The Hub's own score, a blend of recent likes and downloads it does not document. Used only to rank. |
+| `downloads` | The trailing 30 days, not all time; staged as `downloads_30d`. |
+| `safetensors.total` | Parameter count, present only for safetensors repos (42 of the first 100). |
+| `gated` | `false`, `"auto"` or `"manual"`; staged as a boolean. |
+
+Staging re-sorts by score with the id as tie-break, so a rank never depends on
+the order the API happened to return. `mart_hf_trending` keeps one row per model
+that ever trended: first and last day on the list, days on it, best rank, today's
+rank and the change since the previous capture (positive means it climbed).
+
+**The OpenRouter join.** OpenRouter's catalogue names the weights' repo in
+`hugging_face_id` for about 40% of its models. The mart matches it to the trending
+id case-insensitively and records when OpenRouter first listed the model.
+Quantised and fine-tuned repos (`-GGUF`, `-MLX`, community fine-tunes) carry their
+own ids and never match, which is correct: OpenRouter serves the base model. In a
+test capture on 2026-11-24, 11 of the top 100 were served on OpenRouter; the top
+one, Inkling 2 Mini, had been listed there that same day.
+
+The capture is best-effort. A failure is recorded in the manifest and does not
+cost the day's OpenRouter data; `hf_trending_captured` warns when the latest
+capture lacks the list or holds fewer than 50 models, and a contract test checks
+the endpoint's shape and ordering every day.
+
