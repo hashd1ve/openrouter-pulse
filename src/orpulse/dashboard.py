@@ -14,7 +14,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from . import charts, config, ingest, quality
+from . import charts, config, ingest, quality, report
 from .charts import esc, fmt_compact
 from .transform import load_marts
 
@@ -443,6 +443,24 @@ where to look and settles nothing.</p></div>
 """
 
 
+def _agentic_reading(a, u) -> str:
+    """The reversal paragraph, only when this capture actually shows it."""
+    if a is None or u is None:
+        return ""
+    if report.reversal(u, a):
+        return f"""<p>The result worth the space is the reversal in agentic traffic. Counting
+models equally, price explains nothing. Weighting by requests, the elasticity is
+<strong>{a.elasticity:+.2f}</strong> ({a.ci_low:+.2f} to {a.ci_high:+.2f}) and
+clears zero comfortably. Agentic <em>models</em> are not price-sensitive; agentic
+<em>volume</em> is, which is what a small number of very large consumers
+optimising unit cost looks like.</p>"""
+    return f"""<p>In agentic traffic, counting models equally gives
+{u.elasticity:+.2f} ({u.ci_low:+.2f} to {u.ci_high:+.2f}) and weighting by requests
+<strong>{a.elasticity:+.2f}</strong> ({a.ci_low:+.2f} to {a.ci_high:+.2f}). The reversal
+this section looks for, models indifferent to price while their volume is not,
+does not show in this capture: {report._clears_zero_phrase(u, a)}.</p>"""
+
+
 def _elasticity(el):
     if el.empty:
         return ""
@@ -455,6 +473,8 @@ def _elasticity(el):
         })
     agentic = el[(el["segment"] == "agentic") & (el["weighting"] == "request_weighted")]
     a = agentic.iloc[0] if len(agentic) else None
+    agentic_u = el[(el["segment"] == "agentic") & (el["weighting"] == "unweighted")]
+    u = agentic_u.iloc[0] if len(agentic_u) else None
 
     return f"""
 <h2>5 · Price response, and where it hides</h2>
@@ -468,12 +488,7 @@ two weightings: one model one vote, or one request one vote.</p>
   <figcaption>Point estimate with its 95% interval, coloured where the interval
   excludes zero.</figcaption>
 </figure>
-{f'''<p>The result worth the space is the reversal in agentic traffic. Counting
-models equally, price explains nothing. Weighting by requests, the elasticity is
-<strong>{a.elasticity:+.2f}</strong> ({a.ci_low:+.2f} to {a.ci_high:+.2f}) and
-clears zero comfortably. Agentic <em>models</em> are not price-sensitive; agentic
-<em>volume</em> is, which is what a small number of very large consumers
-optimising unit cost looks like.</p>''' if a is not None else ""}
+{_agentic_reading(a, u)}
 <div class="callout"><p><strong>Association, not cause.</strong> No model is
 observed at two prices here. Cheap models differ from dear ones in quality as
 well as price, so a steep slope fits "buyers hunt cheap tokens" and "cheap models

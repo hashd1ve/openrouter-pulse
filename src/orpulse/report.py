@@ -43,6 +43,24 @@ def _table(rows: list[list[str]], headers: list[str]) -> str:
     return "\n".join(out)
 
 
+def _straddles_zero(row) -> bool:
+    return row.ci_low <= 0 <= row.ci_high
+
+
+def reversal(unweighted, weighted) -> bool:
+    """Models indifferent to price (straddles zero), volume sensitive (clears it)."""
+    return _straddles_zero(unweighted) and not _straddles_zero(weighted)
+
+
+def _clears_zero_phrase(unweighted, weighted) -> str:
+    u, w = not _straddles_zero(unweighted), not _straddles_zero(weighted)
+    if u and w:
+        return "both clear zero"
+    if not u and not w:
+        return "neither clears zero"
+    return "only the unweighted one clears zero"
+
+
 def build(marts: dict[str, pd.DataFrame]) -> str:
     fp = marts.get("mart_model_fingerprint", pd.DataFrame())
     if fp.empty:
@@ -414,7 +432,8 @@ or one request, one vote.
         agu = el[(el["segment"] == "agentic") & (el["weighting"] == "unweighted")]
         if len(ag) and len(agu):
             a, u = ag.iloc[0], agu.iloc[0]
-            add(f"""
+            if reversal(u, a):
+                add(f"""
 **The reversal in agentic traffic is the result worth the space.** Counting
 models equally, price explains nothing ({u.elasticity:+.2f}, interval
 {u.ci_low:+.2f} to {u.ci_high:+.2f}, straddling zero). Weighting by requests, the
@@ -424,7 +443,17 @@ clears zero comfortably.
 Agentic *models* are not price-sensitive. Agentic *volume* is. That is what a
 small number of very large consumers optimising unit cost looks like, and it is
 invisible to any analysis treating each model as one data point.
-
+""")
+            else:
+                add(f"""
+**Agentic traffic, both ways.** Counting models equally, the elasticity is
+{u.elasticity:+.2f} ({u.ci_low:+.2f} to {u.ci_high:+.2f}); weighting by requests it is
+**{a.elasticity:+.2f}** ({a.ci_low:+.2f} to {a.ci_high:+.2f}). The reversal this section
+looks for, models indifferent to price while their volume is not, needs the first
+interval to straddle zero and the second to clear it. In this capture
+{_clears_zero_phrase(u, a)}.
+""")
+            add("""
 **Read this as association, not cause.** Nothing here observes one model at two
 prices; it compares models that differ in price and in everything else, quality
 included. Either story fits a steep slope: buyers hunting cheap tokens, or cheap

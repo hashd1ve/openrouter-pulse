@@ -20,6 +20,13 @@ usage styles; it's two populations that a leaderboard flattens into one.
 
 ## Results
 
+Written from the first capture, 2026-07-31. [FINDINGS.md](docs/FINDINGS.md) is
+regenerated from the latest capture every day and is where current numbers live.
+The value figures below (money, concentration by value, elasticity) were computed
+with a price picked at random among a model's catalogue entries, its batch and free
+ones included, and are understated; [Methodology §7](docs/METHODOLOGY.md#7-implied-gross-value)
+has the fix and its size.
+
 **Workloads split in two.** Agentic traffic is 62 model-variants, 70% of tokens,
 85% of implied value. The classification cuts sit at the minima of the
 token-weighted density, so they're measured, not chosen.
@@ -76,7 +83,9 @@ clean, false chart. [Methodology §2](docs/METHODOLOGY.md#2-the-trap-that-shaped
 has the verification.
 
 So `data/raw/` is the only time series this feed has, and a day not captured is
-gone. Hence the daily cron and the append-only archive.
+gone. Hence the daily cron and the append-only archive. There is one gap, 21–23
+November 2026, when OpenRouter turned the day window into a rolling 24 hours and
+the pipeline refused the captures ([Methodology §2](docs/METHODOLOGY.md#2-the-trap-that-shaped-the-design)).
 
 ## Layout
 

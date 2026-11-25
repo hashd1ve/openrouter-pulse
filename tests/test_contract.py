@@ -81,8 +81,26 @@ def test_rankings_is_not_a_daily_time_series(rankings):
     )
 
 
+def test_windows_close_where_the_pipeline_expects(rankings):
+    """Week and month close together; the day closes with them or after them.
+
+    Until 2026-11-20 all three closed at the same midnight. On 2026-11-21
+    `view=day` became a rolling 24 hours stamped by the hour, closing after the
+    week. Either is handled. Week and month drifting apart, or the day closing
+    before the week, is a third semantics nobody has looked at yet.
+    """
+    ends = {w: max(r["date"] for r in rankings[w]["data"]) for w in ("day", "week", "month")}
+    assert ends["week"] == ends["month"], f"week and month no longer close together: {ends}"
+    assert ends["day"] >= ends["week"], f"the day window now closes before the week: {ends}"
+
+
 def test_windows_are_nested_and_cumulative(rankings):
-    """The semantic invariant the pipeline's headline check relies on."""
+    """The semantic invariant the pipeline's headline check relies on.
+
+    day <= week only holds while the two close at the same moment; once the day
+    is rolling it covers hours the week does not, so only week <= month is
+    asserted then (see quality.check_nested_windows).
+    """
     def totals(window):
         return {
             (r["model_permaslug"], r["variant"]):
@@ -94,9 +112,15 @@ def test_windows_are_nested_and_cumulative(rankings):
     shared = set(day) & set(week) & set(month)
     assert len(shared) > 50, "too few models in common to verify nesting"
 
-    violations = [k for k in shared if not (day[k] <= week[k] * 1.01 <= month[k] * 1.02)]
+    day_nests = max(r["date"] for r in rankings["day"]["data"]) <= max(
+        r["date"] for r in rankings["week"]["data"]
+    )
+    violations = [
+        k for k in shared
+        if week[k] * 1.01 > month[k] * 1.02 or (day_nests and day[k] > week[k] * 1.01)
+    ]
     assert not violations, (
-        f"{len(violations)} models violate day<=week<=month; "
+        f"{len(violations)} models violate the nesting of the windows; "
         f"window semantics changed (e.g. {violations[:3]})"
     )
 

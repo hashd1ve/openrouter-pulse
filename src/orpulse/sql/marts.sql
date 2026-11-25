@@ -16,7 +16,27 @@
 -- Prices change, and capturing when they change is worth something on its own.
 -- ---------------------------------------------------------------------
 CREATE OR REPLACE TABLE dim_model AS
-WITH attrs AS (
+WITH one_entry AS (
+    -- The catalogue lists a model once per variant (`x`, `x:batch`, `x:free`),
+    -- all under the same canonical slug: 96 slugs in the 2026-11-20 capture.
+    -- Keyed on the slug alone, the versioning below saw ties on every capture
+    -- and picked a price at random, so a rebuild could move a lab's share of
+    -- implied value by five points. Keep the list price, as METHODOLOGY says:
+    -- the entry without a suffix, then the lowest id if there is none.
+    SELECT * EXCLUDE (entry_rank)
+    FROM (
+        SELECT
+            *,
+            row_number() OVER (
+                PARTITION BY snapshot_date, model_permaslug
+                ORDER BY contains(coalesce(model_id, ''), ':'), model_id
+            ) AS entry_rank
+        FROM stg_models
+        WHERE model_permaslug IS NOT NULL
+    )
+    WHERE entry_rank = 1
+),
+attrs AS (
     SELECT
         *,
         md5(concat_ws('|',
@@ -24,8 +44,7 @@ WITH attrs AS (
             coalesce(CAST(price_completion AS VARCHAR), '~'),
             coalesce(CAST(context_length   AS VARCHAR), '~')
         )) AS attr_hash
-    FROM stg_models
-    WHERE model_permaslug IS NOT NULL
+    FROM one_entry
 ),
 marked AS (
     SELECT
@@ -92,6 +111,7 @@ SELECT
     CAST(requests AS BIGINT)           AS requests,
     -- Descriptive attribute, explicitly NOT the time key. See header.
     source_last_activity_date,
+    source_last_activity_ts,
     source_change
 FROM stg_model_usage
 WHERE model_permaslug IS NOT NULL;
