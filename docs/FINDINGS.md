@@ -25,7 +25,7 @@ with identical token volume can be doing entirely different jobs.
 | **conversational** | 312 | 115.12 T | 13.8% | 10.1 | 3,854 | moderate context per output token, human-sized interactions |
 | **extractive** | 53 | 45.68 T | 5.5% | 59.0 | 4,574 | context-heavy but small interactions: classification, extraction, routing |
 | **unclassified** | 176 | 5.25 T | 0.6% | — | 36 | insufficient data to classify |
-| **output_heavy** | 123 | 302.69 B | 0.0% | 0.3 | 4,410 | emits one token per two consumed; in practice almost entirely image-output models |
+| **output_heavy** | 123 | 302.70 B | 0.0% | 0.3 | 4,410 | emits one token per two consumed; in practice almost entirely image-output models |
 
 Models classified as *agentic* account for **80.0% of all tokens**
 while being 101 of 765 model-variants. Conversational
@@ -87,7 +87,7 @@ arithmetic alone, and the analysis then "discovers" that new models grow.
 Across 263 ratable model-variants (at least
 7 days old and above
 1,000,000 monthly requests), momentum has a
-median of **0.96** with a p25–p75 range of 0.68–1.19.
+median of **0.95** with a p25–p75 range of 0.68–1.25.
 A median near 1.0 is the expected signature of a market that is neither
 collapsing nor exploding in aggregate.
 
@@ -101,32 +101,32 @@ artefact the correction removes.
 
 | Model | Momentum | Tokens (30d) | Age (days) | Archetype |
 |---|---|---|---|---|
-| `google/gemini-3-flash-preview-20251217` | 17.73× | 317.29 M | 343 | conversational |
-| `deepseek/deepseek-v4.1-flash-20261017` | 8.24× | 64.88 B | 39 | output_heavy |
-| `scaledown/extract-20260928` | 6.53× | 12.67 B | 43 | conversational |
-| `bytedance-seed/seed-2.0-lite-20260309` | 4.76× | 30.07 B | 260 | conversational |
-| `thinkingmachines/inkling-small-20260730` | 4.56× | 39.88 B | 118 | conversational |
-| `openai/gpt-oss-20b` | 4.01× | 3.49 B | 477 | conversational |
-| `deepseek/deepseek-v4.1-flash-20260910` | 3.63× | 21.63 B | 76 | conversational |
-| `openai/gpt-4.1-nano-2025-04-14` | 3.30× | 50.71 B | 590 | conversational |
+| `google/gemini-3-flash-preview-20251217` | 17.75× | 317.29 M | 343 | conversational |
+| `scaledown/extract-20260928` | 10.70× | 12.67 B | 43 | conversational |
+| `deepseek/deepseek-v4.1-flash-20261017` | 7.15× | 64.89 B | 39 | output_heavy |
+| `bytedance-seed/seed-2.0-lite-20260309` | 7.00× | 30.07 B | 260 | conversational |
+| `openai/gpt-4.1-nano-2025-04-14` | 4.70× | 50.71 B | 590 | conversational |
+| `google/gemini-3.1-flash-lite-20260507` | 4.31× | 23.17 B | 202 | conversational |
+| `openai/gpt-oss-20b` | 3.93× | 3.49 B | 477 | conversational |
+| `deepseek/deepseek-v4.1-flash-20260910` | 3.67× | 21.63 B | 76 | conversational |
 
 **Fading** — lowest momentum among ratable models:
 
 | Model | Momentum | Tokens (30d) | Age (days) | Archetype |
 |---|---|---|---|---|
-| `google/gemini-3.6-flash-20260721` | 0.04× | 2.24 B | 127 | conversational |
+| `dots-studio/dots-3-note-preview-20260813` | 0.01× | 3.09 T | 103 | agentic |
+| `tencent/hy4-preview-20260827` | 0.04× | 4.66 T | 89 | agentic |
 | `upstage/solar-mini4-20260922` | 0.04× | 2.17 T | 63 | agentic |
-| `tencent/hy4-preview-20260827` | 0.05× | 4.66 T | 89 | agentic |
 | `stepfun/step-5-preview-20261008` | 0.06× | 430.31 B | 48 | extractive |
-| `openai/gpt-5.6-luna-20260709` | 0.07× | 56.08 B | 139 | conversational |
 | `stepfun/step-3.7-flash-20260528` | 0.08× | 741.46 B | 181 | agentic |
-| `ricursiveai/ripple-65b-preview-20261104` | 0.11× | 32.38 B | 21 | conversational |
-| `google/gemma-2-27b-it` | 0.18× | 448.62 M | 865 | conversational |
+| `xiaomi/mimo-v2.5-20260422` | 0.11× | 100.44 B | 217 | conversational |
+| `ricursiveai/ripple-65b-preview-20261104` | 0.13× | 32.38 B | 21 | conversational |
+| `google/gemma-2-27b-it` | 0.14× | 448.62 M | 865 | conversational |
 
 ## 4. Attention and money are different markets
 
 Multiplying each model's tokens by its list price gives the gross value its
-traffic represents: **$429.0 M per month** across
+traffic represents: **$419.5 M per month** across
 490 priced model-variants.
 
 This is an upper bound, not revenue: it ignores prompt-cache discounts, batch
@@ -135,23 +135,23 @@ is called `implied_gross_value` and never `revenue` for that reason.
 
 | Lab | Share of tokens | Share of implied value | Value per token of attention |
 |---|---|---|---|
-| `anthropic` | 7.7% | 45.2% | 5.86x |
-| `openai` | 10.0% | 18.2% | 1.82x |
-| `deepseek` | 43.8% | 13.0% | 0.30x |
-| `google` | 4.0% | 8.5% | 2.11x |
+| `anthropic` | 7.7% | 46.2% | 6.00x |
+| `openai` | 10.0% | 18.7% | 1.86x |
+| `deepseek` | 43.8% | 11.5% | 0.26x |
+| `google` | 4.0% | 8.7% | 2.16x |
 | `z-ai` | 9.7% | 2.9% | 0.30x |
-| `nvidia` | 4.3% | 2.3% | 0.55x |
-| `moonshotai` | 2.8% | 1.9% | 0.68x |
-| `tencent` | 4.9% | 1.7% | 0.35x |
+| `nvidia` | 4.3% | 2.4% | 0.57x |
+| `moonshotai` | 2.8% | 1.9% | 0.69x |
+| `tencent` | 4.9% | 1.7% | 0.34x |
 
 Concentration makes the same point without naming a winner. Measured by tokens,
 the labs sit at an HHI of **1,061**. Measured by money they sit at
-**3,090**, past the 2,500 mark competition authorities treat as
-highly concentrated, and the largest lab takes **52.3%** of
+**3,262**, past the 2,500 mark competition authorities treat as
+highly concentrated, and the largest lab takes **54.1%** of
 the value against 17.2% of the tokens.
 
 The Gini coefficient across models is **0.935** by tokens
-and **0.940** by value. Both are extreme; a
+and **0.939** by value. Both are extreme; a
 national income distribution above 0.6 is considered severe.
 
 
@@ -192,19 +192,19 @@ For models served by more than one provider, an endpoint is *dominated* when
 another endpoint for the same model is both cheaper per completion token and
 faster at the median. There is no rational reason to route traffic to it.
 
-Of 1,236 endpoints serving multi-provider models,
-**875 are dominated** (70.8%).
+Of 1,274 endpoints serving multi-provider models,
+**893 are dominated** (70.1%).
 
 | Model | Dominated endpoint | $/M out | p50 throughput | Beaten by | # better |
 |---|---|---|---|---|---|
-| `deepseek/deepseek-v4.1-flash-20261017` | Google | $1.20 | 106 tok/s | Pearl Research | 36 |
-| `~deepseek/deepseek-flash-latest` | Google | $1.20 | 106 tok/s | Pearl Research | 36 |
-| `z-ai/glm-5.3-20260816` | SambaNova | $4.40 | 45 tok/s | Wafer | 35 |
-| `~z-ai/glm-latest` | SambaNova | $4.40 | 45 tok/s | Wafer | 35 |
-| `z-ai/glm-5.3-flash-20260826` | Parasail | $0.62 | 28 tok/s | Relace | 35 |
-| `~z-ai/glm-flash-latest` | Parasail | $0.62 | 27 tok/s | Relace | 34 |
-| `deepseek/deepseek-v4.1-flash-20260910` | Google | $1.20 | 67 tok/s | DeepInfra | 32 |
-| `deepseek/deepseek-v4.1-flash-20260910` | Baidu | $1.20 | 67 tok/s | DeepInfra | 32 |
+| `deepseek/deepseek-v4.1-flash-20261017` | Google | $1.20 | 98 tok/s | Pearl Research | 38 |
+| `~deepseek/deepseek-flash-latest` | Google | $1.20 | 98 tok/s | Pearl Research | 38 |
+| `z-ai/glm-5.3-flash-20260826` | Parasail | $0.62 | 23 tok/s | Relace | 37 |
+| `~z-ai/glm-flash-latest` | Parasail | $0.62 | 23 tok/s | Relace | 37 |
+| `z-ai/glm-5.3-20260816` | Mistral | $4.84 | 10 tok/s | Wafer | 35 |
+| `~z-ai/glm-latest` | Mistral | $4.84 | 10 tok/s | Wafer | 35 |
+| `z-ai/glm-5.3-20260816` | Mistral | $4.40 | 12 tok/s | Wafer | 33 |
+| `~z-ai/glm-latest` | Mistral | $4.40 | 12 tok/s | Wafer | 33 |
 
 *Caveat that matters:* these percentiles come from a 30-minute rolling window,
 so one capture samples half an hour. A single snapshot suggests where to look;
@@ -235,26 +235,23 @@ or one request, one vote.
 
 | Segment | Weighting | Elasticity | 95% CI | R² | n | Clears zero |
 |---|---|---|---|---|---|---|
-| **agentic** | request weighted | -0.56 | -0.88 to -0.24 | 0.192 | 93 | yes |
-| **all** | request weighted | -0.24 | -0.53 to +0.05 | 0.017 | 469 | no |
+| **agentic** | request weighted | -0.51 | -0.74 to -0.28 | 0.181 | 93 | yes |
+| **all** | request weighted | -0.29 | -0.60 to +0.02 | 0.026 | 469 | no |
 | **conversational** | request weighted | -0.22 | -0.51 to +0.07 | 0.028 | 291 | no |
-| **extractive** | request weighted | -1.18 | -1.60 to -0.77 | 0.421 | 31 | yes |
+| **extractive** | request weighted | -1.10 | -1.57 to -0.63 | 0.371 | 31 | yes |
 | **output_heavy** | request weighted | -0.44 | -0.87 to -0.01 | 0.179 | 54 | yes |
-| **agentic** | unweighted | -0.33 | -0.67 to +0.02 | 0.038 | 93 | no |
-| **all** | unweighted | -0.39 | -0.63 to -0.14 | 0.024 | 469 | yes |
+| **agentic** | unweighted | -0.35 | -0.69 to -0.00 | 0.045 | 93 | yes |
+| **all** | unweighted | -0.40 | -0.64 to -0.15 | 0.026 | 469 | yes |
 | **conversational** | unweighted | -0.47 | -0.76 to -0.18 | 0.044 | 291 | yes |
-| **extractive** | unweighted | -0.39 | -1.33 to +0.55 | 0.017 | 31 | no |
+| **extractive** | unweighted | -0.40 | -1.33 to +0.52 | 0.019 | 31 | no |
 | **output_heavy** | unweighted | -0.44 | -0.94 to +0.07 | 0.047 | 54 | no |
 
-**The reversal in agentic traffic is the result worth the space.** Counting
-models equally, price explains nothing (-0.33, interval
--0.67 to +0.02, straddling zero). Weighting by requests, the
-elasticity is **-0.56** (-0.88 to -0.24) and
-clears zero comfortably.
-
-Agentic *models* are not price-sensitive. Agentic *volume* is. That is what a
-small number of very large consumers optimising unit cost looks like, and it is
-invisible to any analysis treating each model as one data point.
+**Agentic traffic, both ways.** Counting models equally, the elasticity is
+-0.35 (-0.69 to -0.00); weighting by requests it is
+**-0.51** (-0.74 to -0.28). The reversal this section
+looks for, models indifferent to price while their volume is not, needs the first
+interval to straddle zero and the second to clear it. In this capture
+both clear zero.
 
 
 **Read this as association, not cause.** Nothing here observes one model at two
