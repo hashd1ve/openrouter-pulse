@@ -1,23 +1,23 @@
 {
   "snapshot_date": "2026-11-25",
-  "snapshot_ts": "2026-11-25T10:33:01.528919+00:00",
-  "started_ts": "2026-11-25T10:33:01.528919+00:00",
-  "finished_ts": "2026-11-25T10:35:01.142992+00:00",
-  "duration_seconds": 119.61,
+  "snapshot_ts": "2026-11-25T17:11:42.016602+00:00",
+  "started_ts": "2026-11-25T17:11:42.016602+00:00",
+  "finished_ts": "2026-11-25T17:14:03.627848+00:00",
+  "duration_seconds": 141.61,
   "user_agent": "orpulse/0.1 (+https://github.com/hashd1ve/openrouter-pulse; public-data research; daily single capture)",
   "files": {
-    "models": 85186,
-    "rankings_models_day": 40824,
-    "rankings_models_week": 44427,
-    "rankings_models_month": 48954,
-    "rankings_apps": 3941,
-    "providers": 4349,
-    "hf_trending": 7604,
-    "endpoint_stats": 739818
+    "models": 84923,
+    "rankings_models_day": 40626,
+    "rankings_models_week": 44410,
+    "rankings_models_month": 48979,
+    "rankings_apps": 3947,
+    "providers": 4354,
+    "hf_trending": 7561,
+    "endpoint_stats": 737198
   },
-  "requests_ok": 479,
+  "requests_ok": 476,
   "requests_failed": 0,
-  "bytes_received": 19654345,
+  "bytes_received": 19670580,
   "failures": [],
   "complete": true
 }
